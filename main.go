@@ -52,7 +52,7 @@ func main() {
 	// Add handlers
 	dg.AddHandler(handlers.Welcome(dbClient))
 	dg.AddHandler(handlers.Goodbye())
-	dg.AddHandler(handlers.Moderation(dg))
+	dg.AddHandler(handlers.Moderation(dg, cfg.IdRoleAuto))
 	dg.AddHandler(handlers.Message(cfg.IdChannelMessage))
 
 	// Connect to Discord

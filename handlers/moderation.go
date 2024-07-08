@@ -8,7 +8,7 @@ import (
 )
 
 // Moderation handles moderation commands
-func Moderation(s *discordgo.Session) func(*discordgo.Session, *discordgo.MessageCreate) {
+func Moderation(s *discordgo.Session, idRole string) func(*discordgo.Session, *discordgo.MessageCreate) {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// Check if the message is a command
 		if !strings.HasPrefix(m.Content, "/") {
@@ -23,15 +23,15 @@ func Moderation(s *discordgo.Session) func(*discordgo.Session, *discordgo.Messag
 		if command == "/approve" && len(args) == 2 {
 			userID := args[1]
 
-			// Add the "newuser" role to the specified user
-			err := s.GuildMemberRoleAdd(m.GuildID, userID, "newuser")
+			// Add the "auto-role" role to the specified user
+			err := s.GuildMemberRoleAdd(m.GuildID, userID, idRole)
 			if err != nil {
-				fmt.Println("Error adding 'newuser' role:", err)
+				fmt.Println("Error adding 'auto-role' role:", err)
 				return
 			}
 
 			// Send a notification message
-			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Added 'newuser' role to <@%s>!", userID))
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Added 'auto-role' role to <@%s>!", userID))
 		}
 	}
 }

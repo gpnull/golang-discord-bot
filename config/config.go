@@ -11,6 +11,7 @@ type Config struct {
 	MongoDBURI   string
 
 	IdChannelMessage string
+	IdRoleAuto       string
 }
 
 var AppConfig *Config
