@@ -24,11 +24,11 @@ func Welcome(dbClient *database.MongoClient) func(*discordgo.Session, *discordgo
 			return
 		}
 
-		// Add "newuser" role
+		// Add "auto-role" role
 		guildID := m.GuildID
-		err := s.GuildMemberRoleAdd(guildID, m.User.ID, "newuser")
+		err := s.GuildMemberRoleAdd(guildID, m.User.ID, "1202667195944009779")
 		if err != nil {
-			fmt.Println("Error adding 'newuser' role:", err)
+			fmt.Println("Error adding 'auto-role' role:", err)
 			return
 		}
 
