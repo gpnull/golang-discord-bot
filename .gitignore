@@ -1,2 +1,5 @@
-config.yaml
-/tmp
+*.db
+*.exe
+
+config.json
+FINAL_EXECUTABLE_NAME

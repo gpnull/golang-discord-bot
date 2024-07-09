@@ -1,74 +1,91 @@
 package main
 
 import (
-	"context"
-	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
-	"github.com/gpnull/golang-github.com/gpnull/golang-discord-bot/config"
-	"github.com/gpnull/golang-github.com/gpnull/golang-discord-bot/database"
-	"github.com/gpnull/golang-github.com/gpnull/golang-discord-bot/handlers"
+	_ "github.com/lieuweberg/discordgo-template/commands"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/lieuweberg/discordgo-template/util"
 )
 
-const (
-	defaultConfigPath = "config.yaml"
-)
-
-var (
-	CONFIG_FILE_PATH string
-)
+func init() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+}
 
 func main() {
-	// Flag
-	flag.StringVar(&CONFIG_FILE_PATH, "config", defaultConfigPath, "Config path")
-	flag.StringVar(&CONFIG_FILE_PATH, "c", defaultConfigPath, "Config path (shorthand)")
-
-	cfg, err := config.LoadConfig(CONFIG_FILE_PATH)
+	s, err := discordgo.New("Bot " + util.Config.Token)
 	if err != nil {
-		fmt.Println("Error loading config:", err)
+		log.Panicf("Error creating session: %s", err)
+	}
+
+	s.AddHandler(ready)
+	s.AddHandler(messageCreate)
+
+	s.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds)
+
+	err = s.Open()
+	if err != nil {
+		log.Panicf("Unable to open session: %s", err)
+	}
+
+	// Wait for os terminate events, cleanly close connection when encountered
+	closeChan := make(chan os.Signal, 1)
+	signal.Notify(closeChan, syscall.SIGTERM, syscall.SIGINT, os.Interrupt, os.Kill)
+	<-closeChan
+	log.Print("OS termination received, closing WS and DB")
+	s.Close()
+	log.Print("Connections closed, bye bye")
+}
+
+func ready(s *discordgo.Session, e *discordgo.Ready) {
+	s.UpdateStatusComplex(discordgo.UpdateStatusData{
+		Activities: []*discordgo.Activity{
+			{
+				Name: "I am a cool bot",
+				Type: discordgo.ActivityTypeGame,
+			},
+		},
+		Status: string(discordgo.StatusOnline),
+	})
+
+	log.Print(s.State.User.Username + " is online")
+}
+
+var prefix = "bot "
+
+func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.Author.Bot || !strings.HasPrefix(m.Content, prefix) {
 		return
 	}
 
-	// Connect to MongoDB
-	dbClient, err := database.ConnectDB(cfg.MongoDBURI)
+	perms, err := s.State.UserChannelPermissions(s.State.User.ID, m.ChannelID)
 	if err != nil {
-		fmt.Println("Error connecting to MongoDB:", err)
-		return
-	}
-	defer dbClient.DisconnectDB(context.Background())
-
-	// Create Discord bot
-	dg, err := discordgo.New("Bot " + cfg.DiscordToken)
-	if err != nil {
-		fmt.Println("Error creating Discord bot:", err)
+		log.Printf("Could not get perms for channel %s: %s", m.ChannelID, err)
 		return
 	}
 
-	// Add handlers
-	dg.AddHandler(handlers.Welcome(dbClient))
-	dg.AddHandler(handlers.Goodbye())
-	dg.AddHandler(handlers.Moderation(dg, cfg.IdRoleAuto))
-	dg.AddHandler(handlers.Message(cfg.IdChannelMessage))
+	perm := util.IncludesPerm
 
-	// Connect to Discord
-	err = dg.Open()
-	if err != nil {
-		fmt.Println("Error connecting to Discord:", err)
-		return
+	if perm(discordgo.PermissionViewChannel|discordgo.PermissionSendMessages|discordgo.PermissionEmbedLinks, perms) {
+		args := strings.Split(m.Content[len(prefix):], " ")
+		if cmd, ok := util.Commands[args[0]]; ok {
+			if len(args) == 1 {
+				args = []string{}
+			} else {
+				args = args[1:]
+			}
+
+			cmd(s, m, args)
+		}
+	} else if perm(discordgo.PermissionSendMessages, perms) {
+		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("I seem to be missing permissions. Below, false indicates a lacking permission. Please grant these permissions on my role.\n```"+
+			"Read Text Channels & See Voice Channels: %t\nSend Messages: true\nEmbed Links: %t```",
+			perm(discordgo.PermissionViewChannel, perms), perm(discordgo.PermissionEmbedLinks, perms)))
 	}
-	defer dg.Close()
-
-	fmt.Println("Bot is ready!")
-
-	// Wait for stop signal
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-	<-stop
-
-	fmt.Println("Shutting down bot...")
 }
