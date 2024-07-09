@@ -8,10 +8,10 @@ import (
 	"strings"
 	"syscall"
 
-	_ "github.com/lieuweberg/discordgo-template/commands"
+	_ "github.com/gpnull/golang-github.com/commands"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/lieuweberg/discordgo-template/util"
+	"github.com/gpnull/golang-github.com/util"
 )
 
 func init() {

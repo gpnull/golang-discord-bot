@@ -2,9 +2,10 @@ package commands
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/lieuweberg/discordgo-template/util"
+	"github.com/gpnull/golang-github.com/util"
 )
 
 func init() {
@@ -21,14 +22,17 @@ func ping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 		return
 	}
 
-	start, _ := m.Timestamp.Parse()
-	end, _ := msg.Timestamp.Parse()
+	start, _ := time.Parse(time.RFC3339, m.Timestamp.String())
+	end, _ := time.Parse(time.RFC3339, msg.Timestamp.String())
 	sendLatency := end.Sub(start)
 
 	start = end
-	end, _ = msge.EditedTimestamp.Parse()
+	end, _ = time.Parse(time.RFC3339, msge.EditedTimestamp.String())
 	editLatency := end.Sub(start)
 
 	_, err = s.ChannelMessageEdit(m.ChannelID, msg.ID, fmt.Sprintf("Pong!\n``` - Send latency: %dms (%dμs)\n - Edit latency: %dms (%dμs)\n - API latency: %dms (%dμs)```",
 		sendLatency/1e6, sendLatency/1e3, editLatency/1e6, editLatency/1e3, s.HeartbeatLatency().Milliseconds(), s.HeartbeatLatency().Microseconds()))
+	if err != nil {
+		return
+	}
 }
