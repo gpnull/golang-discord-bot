@@ -36,7 +36,7 @@ func main() {
 
 	// Wait for os terminate events, cleanly close connection when encountered
 	closeChan := make(chan os.Signal, 1)
-	signal.Notify(closeChan, syscall.SIGTERM, syscall.SIGINT, os.Interrupt, os.Kill)
+	signal.Notify(closeChan, syscall.SIGTERM, syscall.SIGINT, os.Interrupt, syscall.SIGTERM)
 	<-closeChan
 	log.Print("OS termination received, closing WS and DB")
 	s.Close()
@@ -57,7 +57,7 @@ func ready(s *discordgo.Session, e *discordgo.Ready) {
 	log.Print(s.State.User.Username + " is online")
 }
 
-var prefix = "bot "
+var prefix = "/"
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.Bot || !strings.HasPrefix(m.Content, prefix) {
