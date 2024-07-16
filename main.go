@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -9,9 +10,11 @@ import (
 	"syscall"
 
 	_ "github.com/gpnull/golang-github.com/commands"
+	"github.com/gpnull/golang-github.com/database"
+	"github.com/gpnull/golang-github.com/ready"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/gpnull/golang-github.com/util"
+	util "github.com/gpnull/golang-github.com/utils"
 )
 
 func init() {
@@ -24,11 +27,24 @@ func main() {
 		log.Panicf("Error creating session: %s", err)
 	}
 
-	s.AddHandler(ready)
-	s.AddHandler(messageCreate)
-	s.AddHandler(guildMemberAdd) // Add handler for guild member add event
+	// Connect to MongoDB
+	dbClient, err := database.ConnectDB(util.Config.MongoURI)
+	if err != nil {
+		fmt.Println("Error connecting to MongoDB:", err)
+		return
+	}
+	defer dbClient.DisconnectDB(context.Background())
 
-	s.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildMembers) // Add GuildMembers intent
+	s.AddHandler(func(s *discordgo.Session, e *discordgo.Ready) {
+		ready.Status(s, e)
+	})
+	s.AddHandler(func(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
+		ready.GuildMemberAdd(dbClient, s, m)
+	})
+	s.AddHandler(messageCreate)
+
+	s.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages |
+		discordgo.IntentsGuilds | discordgo.IntentsGuildMembers) // GuildMembers intent
 
 	err = s.Open()
 	if err != nil {
@@ -44,20 +60,6 @@ func main() {
 	log.Print("Connections closed, bye bye")
 }
 
-func ready(s *discordgo.Session, e *discordgo.Ready) {
-	s.UpdateStatusComplex(discordgo.UpdateStatusData{
-		Activities: []*discordgo.Activity{
-			{
-				Name: "I am a cool bot",
-				Type: discordgo.ActivityTypeGame,
-			},
-		},
-		Status: string(discordgo.StatusOnline),
-	})
-
-	log.Print(s.State.User.Username + " is online")
-}
-
 var prefix = "."
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -68,6 +70,20 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	perms, err := s.State.UserChannelPermissions(s.State.User.ID, m.ChannelID)
 	if err != nil {
 		log.Printf("Could not get perms for channel %s: %s", m.ChannelID, err)
+		return
+	}
+
+	// Check user's role
+	hasRole := false
+	for _, roleID := range m.Member.Roles {
+		if roleID == util.Config.UseBot {
+			hasRole = true
+			break
+		}
+	}
+
+	if !hasRole {
+		s.ChannelMessageSend(m.ChannelID, "You do not have permission to use this command.")
 		return
 	}
 
@@ -88,22 +104,5 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("I seem to be missing permissions. Below, false indicates a lacking permission. Please grant these permissions on my role.\n```"+
 			"Read Text Channels & See Voice Channels: %t\nSend Messages: true\nEmbed Links: %t```",
 			perm(discordgo.PermissionViewChannel, perms), perm(discordgo.PermissionEmbedLinks, perms)))
-	}
-}
-
-func guildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
-	fmt.Println("User: \n", m)
-	// Replace "WelcomeRoleID" with the actual ID of the role you want to assign
-	err := s.GuildMemberRoleAdd(m.GuildID, m.User.ID, "1202667195944009779")
-	if err != nil {
-		log.Printf("Error adding role to new member: %s", err)
-		return
-	}
-
-	// Replace "WelcomeChannelID" with the actual ID of the channel you want to send the message to
-	_, err = s.ChannelMessageSend("1202666419519619166", fmt.Sprintf("Welcome to the server, %s!", m.User.Username))
-	if err != nil {
-		log.Printf("Error sending welcome message: %s", err)
-		return
 	}
 }

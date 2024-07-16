@@ -6,7 +6,9 @@ import (
 )
 
 type configuration struct {
-	Token string `json:"token"`
+	Token    string `json:"token"`
+	MongoURI string `json:"mongo_uri"`
+	UseBot   string `json:"use_bot"`
 }
 
 // Config is the config.json file

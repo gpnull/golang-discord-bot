@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/gpnull/golang-github.com/util"
+	util "github.com/gpnull/golang-github.com/utils"
 )
 
 func init() {
