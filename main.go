@@ -26,8 +26,9 @@ func main() {
 
 	s.AddHandler(ready)
 	s.AddHandler(messageCreate)
+	s.AddHandler(guildMemberAdd) // Add handler for guild member add event
 
-	s.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds)
+	s.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsGuildMembers) // Add GuildMembers intent
 
 	err = s.Open()
 	if err != nil {
@@ -57,7 +58,7 @@ func ready(s *discordgo.Session, e *discordgo.Ready) {
 	log.Print(s.State.User.Username + " is online")
 }
 
-var prefix = "/"
+var prefix = "."
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.Bot || !strings.HasPrefix(m.Content, prefix) {
@@ -87,5 +88,22 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("I seem to be missing permissions. Below, false indicates a lacking permission. Please grant these permissions on my role.\n```"+
 			"Read Text Channels & See Voice Channels: %t\nSend Messages: true\nEmbed Links: %t```",
 			perm(discordgo.PermissionViewChannel, perms), perm(discordgo.PermissionEmbedLinks, perms)))
+	}
+}
+
+func guildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
+	fmt.Println("User: \n", m)
+	// Replace "WelcomeRoleID" with the actual ID of the role you want to assign
+	err := s.GuildMemberRoleAdd(m.GuildID, m.User.ID, "1202667195944009779")
+	if err != nil {
+		log.Printf("Error adding role to new member: %s", err)
+		return
+	}
+
+	// Replace "WelcomeChannelID" with the actual ID of the channel you want to send the message to
+	_, err = s.ChannelMessageSend("1202666419519619166", fmt.Sprintf("Welcome to the server, %s!", m.User.Username))
+	if err != nil {
+		log.Printf("Error sending welcome message: %s", err)
+		return
 	}
 }
