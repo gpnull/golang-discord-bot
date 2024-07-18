@@ -39,7 +39,10 @@ func main() {
 		ready.Status(s, e)
 	})
 	s.AddHandler(func(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
-		ready.GuildMemberAdd(dbClient, s, m)
+		ready.GuildMemberAdd(s, m, dbClient, util.Config.AutoRoleId, util.Config.WelcomeChannelID)
+	})
+	s.AddHandler(func(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
+		ready.GuildMemberLeave(s, m, util.Config.LeaveChannelID)
 	})
 	s.AddHandler(messageCreate)
 
@@ -76,7 +79,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// Check user's role
 	hasRole := false
 	for _, roleID := range m.Member.Roles {
-		if roleID == util.Config.UseBot {
+		if roleID == util.Config.UseBotID {
 			hasRole = true
 			break
 		}

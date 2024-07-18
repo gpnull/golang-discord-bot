@@ -2,20 +2,33 @@ package ready
 
 import (
 	"log"
+	"math/rand"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func Status(s *discordgo.Session, e *discordgo.Ready) {
-	s.UpdateStatusComplex(discordgo.UpdateStatusData{
-		Activities: []*discordgo.Activity{
-			{
-				Name: "I am a cool bot",
-				Type: discordgo.ActivityTypeCustom,
-			},
-		},
-		Status: string(discordgo.StatusOnline),
-	})
+	go func() {
+		for {
+			statusIndex := rand.Intn(3) // Generate a random index for status selection
+			statuses := []string{"perfect nil", "perfect null", "perfect bot"}
+
+			s.UpdateStatusComplex(discordgo.UpdateStatusData{
+				IdleSince: nil, // Set this to a time to show idle status
+				Activities: []*discordgo.Activity{
+					{
+						Name: statuses[statusIndex],
+						Type: discordgo.ActivityTypeWatching,
+					},
+				},
+				AFK:    true,
+				Status: string(discordgo.StatusOnline),
+			})
+
+			time.Sleep(3 * time.Second) // Wait for 3 seconds before changing status
+		}
+	}()
 
 	log.Print(s.State.User.Username + " is online")
 }

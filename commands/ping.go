@@ -13,7 +13,7 @@ func init() {
 }
 
 func ping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
-	msg, err := s.ChannelMessageSend(m.ChannelID, "Pong...")
+	msg, err := s.ChannelMessageSendReply(m.ChannelID, "Pong...", m.Reference())
 	if err != nil {
 		return
 	}
@@ -32,6 +32,12 @@ func ping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 
 	_, err = s.ChannelMessageEdit(m.ChannelID, msg.ID, fmt.Sprintf("Pong!\n``` - Send latency: %dms (%dμs)\n - Edit latency: %dms (%dμs)\n - API latency: %dms (%dμs)```",
 		sendLatency/1e6, sendLatency/1e3, editLatency/1e6, editLatency/1e3, s.HeartbeatLatency().Milliseconds(), s.HeartbeatLatency().Microseconds()))
+	if err != nil {
+		return
+	}
+
+	// Add heart reaction to the original message
+	err = s.MessageReactionAdd(m.ChannelID, m.ID, "❤️")
 	if err != nil {
 		return
 	}

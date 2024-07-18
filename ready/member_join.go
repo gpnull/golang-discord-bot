@@ -10,7 +10,8 @@ import (
 	"github.com/gpnull/golang-github.com/models"
 )
 
-func GuildMemberAdd(dbClient *database.MongoClient, s *discordgo.Session, m *discordgo.GuildMemberAdd) {
+func GuildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberAdd,
+	dbClient *database.MongoClient, autoRoleId, welcomeChannelId string) {
 	user := models.User{
 		DiscordID: m.User.ID,
 		Username:  m.User.Username,
@@ -21,17 +22,23 @@ func GuildMemberAdd(dbClient *database.MongoClient, s *discordgo.Session, m *dis
 		return
 	}
 
-	// Replace "WelcomeRoleID" with the actual ID of the role you want to assign
-	err := s.GuildMemberRoleAdd(m.GuildID, m.User.ID, "1202667195944009779")
+	// Use a modal to send a welcome message
+	_, err := s.ChannelMessageSendComplex(welcomeChannelId, &discordgo.MessageSend{
+		Content: fmt.Sprintf("Welcome to the server, %s!", m.User.Username),
+		Embed: &discordgo.MessageEmbed{
+			Title:       "Welcome!",
+			Description: fmt.Sprintf("Hello, %s! Welcome to the server.", m.User.Username),
+			Color:       0x00ff00, // Green color
+		},
+	})
 	if err != nil {
-		log.Printf("Error adding role to new member: %s", err)
+		log.Printf("Error sending welcome message: %s", err)
 		return
 	}
 
-	// Replace "WelcomeChannelID" with the actual ID of the channel you want to send the message to
-	_, err = s.ChannelMessageSend("1202666419519619166", fmt.Sprintf("Welcome to the server, %s!", m.User.Username))
+	err = s.GuildMemberRoleAdd(m.GuildID, m.User.ID, autoRoleId)
 	if err != nil {
-		log.Printf("Error sending welcome message: %s", err)
+		log.Printf("Error adding role to new member: %s", err)
 		return
 	}
 }
