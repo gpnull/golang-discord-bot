@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gpnull/golang-github.com/gpnull/golang-discord-bot/models"
+	"github.com/gpnull/golang-github.com/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -38,11 +39,13 @@ func ConnectDB(uri string) (*MongoClient, error) {
 	}, nil
 }
 
-// CreateUser creates a new user in MongoDB
+// CreateUser creates a new user in MongoDB or updates an existing user if the discord_id already exists
 func (mc *MongoClient) CreateUser(ctx context.Context, user *models.User) error {
-	_, err := mc.users.InsertOne(ctx, user)
+	filter := bson.M{"discord_id": user.DiscordID}
+	update := bson.M{"$set": user}
+	_, err := mc.users.UpdateOne(ctx, filter, update, options.Update().SetUpsert(true))
 	if err != nil {
-		return fmt.Errorf("failed to create user: %v", err)
+		return fmt.Errorf("failed to create/update user: %v", err)
 	}
 	return nil
 }
