@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gpnull/golang-github.com/database"
@@ -34,7 +35,32 @@ func GuildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberAdd,
 		Embed: &discordgo.MessageEmbed{
 			Title:       "Welcome!",
 			Description: fmt.Sprintf("Hello, %s! Welcome to the server.", m.User.Username),
-			Color:       0x00ff00, // Green color
+			Color:       0x00ff00,                        // Green color
+			Timestamp:   time.Now().Format(time.RFC3339), // Add Timestamp
+			Footer: &discordgo.MessageEmbedFooter{
+				Text:    fmt.Sprintf("Join at %s", time.Now().Format("15:04:05 MST")), // Add Footer
+				IconURL: "https://i.imgur.com/AfFp7pu.png",
+			},
+			Thumbnail: &discordgo.MessageEmbedThumbnail{
+				URL: "https://i.imgur.com/AfFp7pu.png", // Add Thumbnail URL
+			},
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    "Author Name",
+				IconURL: "https://i.imgur.com/AfFp7pu.png",
+				URL:     "https://discord.js.org",
+			},
+			Fields: []*discordgo.MessageEmbedField{
+				{
+					Name:   "Field 1",
+					Value:  "Value 1",
+					Inline: true,
+				},
+				{
+					Name:   "Field 2",
+					Value:  "Value 2",
+					Inline: true,
+				},
+			},
 		},
 	})
 	if err != nil {

@@ -1,4 +1,4 @@
-package util
+package utils
 
 import (
 	"encoding/json"
@@ -11,9 +11,9 @@ type configuration struct {
 
 	WelcomeChannelID string `json:"welcome_channel_id"`
 	LeaveChannelID   string `json:"leave_channel_id"`
-	AutoRoleId       string `json:"auto_role_id"`
 
-	UseBotID string `json:"use_bot_id"`
+	AutoRoleId string `json:"auto_role_id"`
+	UseBotID   string `json:"use_bot_id"`
 }
 
 // Config is the config.json file

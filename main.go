@@ -76,19 +76,19 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	// Check user's role
-	hasRole := false
-	for _, roleID := range m.Member.Roles {
-		if roleID == util.Config.UseBotID {
-			hasRole = true
-			break
-		}
-	}
+	// // Check user's role
+	// hasRole := false
+	// for _, roleID := range m.Member.Roles {
+	// 	if roleID == util.Config.UseBotID {
+	// 		hasRole = true
+	// 		break
+	// 	}
+	// }
 
-	if !hasRole {
-		s.ChannelMessageSend(m.ChannelID, "You do not have permission to use this command.")
-		return
-	}
+	// if !hasRole {
+	// 	s.ChannelMessageSend(m.ChannelID, "You do not have permission to use this command.")
+	// 	return
+	// }
 
 	perm := util.IncludesPerm
 
