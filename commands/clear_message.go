@@ -23,6 +23,11 @@ func clear(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	numMessages := 0
 	if len(args) > 0 {
 		numMessages, _ = strconv.Atoi(args[0])
+		fmt.Println("numMessages: ", numMessages)
+	}
+	if numMessages == 0 {
+		s.ChannelMessageSend(m.ChannelID, "The quantity to be deleted is invalid.")
+		return
 	}
 
 	// Fetch messages to delete
