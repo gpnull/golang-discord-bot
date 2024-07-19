@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	_ "github.com/gpnull/golang-github.com/commands"
+	"github.com/gpnull/golang-github.com/cron"
 	"github.com/gpnull/golang-github.com/database"
 	"github.com/gpnull/golang-github.com/ready"
 
@@ -54,6 +55,9 @@ func main() {
 		log.Panicf("Unable to open session: %s", err)
 	}
 
+	// Call ScheduleWelcomeMessages function from cron.go
+	cron.ScheduleWelcomeMessages(s, util.Config.WelcomeChannelID)
+
 	// Wait for os terminate events, cleanly close connection when encountered
 	closeChan := make(chan os.Signal, 1)
 	signal.Notify(closeChan, syscall.SIGTERM, syscall.SIGINT, os.Interrupt, syscall.SIGTERM)
@@ -75,20 +79,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		log.Printf("Could not get perms for channel %s: %s", m.ChannelID, err)
 		return
 	}
-
-	// // Check user's role
-	// hasRole := false
-	// for _, roleID := range m.Member.Roles {
-	// 	if roleID == util.Config.UseBotID {
-	// 		hasRole = true
-	// 		break
-	// 	}
-	// }
-
-	// if !hasRole {
-	// 	s.ChannelMessageSend(m.ChannelID, "You do not have permission to use this command.")
-	// 	return
-	// }
 
 	perm := util.IncludesPerm
 

@@ -4,6 +4,7 @@ go 1.22.3
 
 require (
 	github.com/bwmarrin/discordgo v0.28.1
+	github.com/robfig/cron/v3 v3.0.1
 	go.mongodb.org/mongo-driver v1.16.0
 )
 
