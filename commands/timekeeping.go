@@ -87,7 +87,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "không đúng",
+					Content: "wrong",
 					Flags:   discordgo.MessageFlagsEphemeral,
 				},
 			})
@@ -100,7 +100,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseUpdateMessage,
 					Data: &discordgo.InteractionResponseData{
-						Content:    "cảm ơn",
+						Content:    "nice",
 						Components: []discordgo.MessageComponent{actionRow},
 					},
 				})
@@ -118,7 +118,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "không đúng",
+					Content: "wrong",
 					Flags:   discordgo.MessageFlagsEphemeral,
 				},
 			})

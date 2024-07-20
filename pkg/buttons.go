@@ -38,7 +38,7 @@ func RestoreButtons(s *discordgo.Session, dbClient *database.MongoClient, timeKe
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
-						Content: "không đúng",
+						Content: "wrong",
 						Flags:   discordgo.MessageFlagsEphemeral,
 					},
 				})
@@ -51,7 +51,7 @@ func RestoreButtons(s *discordgo.Session, dbClient *database.MongoClient, timeKe
 					s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 						Type: discordgo.InteractionResponseUpdateMessage,
 						Data: &discordgo.InteractionResponseData{
-							Content:    "cảm ơn",
+							Content:    "nice",
 							Components: []discordgo.MessageComponent{actionRow},
 						},
 					})
@@ -69,7 +69,7 @@ func RestoreButtons(s *discordgo.Session, dbClient *database.MongoClient, timeKe
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
-						Content: "không đúng",
+						Content: "wrong",
 						Flags:   discordgo.MessageFlagsEphemeral,
 					},
 				})
