@@ -1,12 +1,12 @@
 package models
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/bwmarrin/discordgo"
 )
 
 type Timekeeping struct {
-	ID    primitive.ObjectID `bson:"_id,omitempty"`
-	Day   string             `bson:"day"`
-	Start primitive.DateTime `bson:"start"`
-	End   primitive.DateTime `bson:"end"`
+	ID       string                `bson:"_id,omitempty"`
+	ButtonID string                `bson:"button_id"`
+	Label    string                `bson:"label"`
+	Style    discordgo.ButtonStyle `bson:"style"`
 }
