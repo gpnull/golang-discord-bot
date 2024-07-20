@@ -60,7 +60,7 @@ func RestoreButtons(s *discordgo.Session, dbClient *database.MongoClient, timeKe
 					s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 						Type: discordgo.InteractionResponseUpdateMessage,
 						Data: &discordgo.InteractionResponseData{
-							Content:    "tạm biệt",
+							Content:    "bye",
 							Components: []discordgo.MessageComponent{actionRow},
 						},
 					})

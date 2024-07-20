@@ -109,7 +109,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseUpdateMessage,
 					Data: &discordgo.InteractionResponseData{
-						Content:    "tạm biệt",
+						Content:    "bye",
 						Components: []discordgo.MessageComponent{actionRow},
 					},
 				})
