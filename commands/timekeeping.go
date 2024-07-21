@@ -15,6 +15,13 @@ func init() {
 }
 
 func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
+	dbClient, err := database.ConnectDB(util.Config.MongoURI)
+	if err != nil {
+		fmt.Println("Error connecting to MongoDB:", err)
+		return
+	}
+	defer dbClient.DisconnectDB(context.Background())
+
 	if len(args) != 2 {
 		s.ChannelMessageSend(m.ChannelID, "Usage: .createTimekeeping <name_of_register> <id_of_register>")
 		return
@@ -25,7 +32,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 
 	// Create new channel
 	categoryID := "1202666419519619164"
-	_, err := s.GuildChannelCreateComplex(m.GuildID, discordgo.GuildChannelCreateData{
+	timekeeping_channel, err := s.GuildChannelCreateComplex(m.GuildID, discordgo.GuildChannelCreateData{
 		Name:     buttonName,
 		Type:     discordgo.ChannelTypeGuildText,
 		ParentID: categoryID,
@@ -33,6 +40,12 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 	})
 	if err != nil {
 		s.ChannelMessageSend(m.ChannelID, "Cannot create new channel: "+err.Error())
+		return
+	}
+
+	err = dbClient.UpdateUserChannelID(context.Background(), buttonID, timekeeping_channel.ID)
+	if err != nil {
+		fmt.Println("Error updating user channel ID:", err)
 		return
 	}
 
@@ -57,22 +70,14 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		return
 	}
 
-	// Save button info into MongoDB
-	dbClient, err := database.ConnectDB(util.Config.MongoURI)
-	if err != nil {
-		fmt.Println("Error connecting to MongoDB:", err)
-		return
-	}
-	defer dbClient.DisconnectDB(context.Background())
-
-	timekeeping := &models.Timekeeping{
+	timekeepingStatus := &models.TimekeepingStatus{
 		ID:       buttonID,
 		ButtonID: buttonID,
 		Label:    buttonName,
 		Style:    discordgo.PrimaryButton,
 	}
 
-	err = dbClient.SaveButton(context.Background(), timekeeping)
+	err = dbClient.SaveTimeKeepingStatusButton(context.Background(), timekeepingStatus)
 	if err != nil {
 		fmt.Println("Error saving button information:", err)
 		return

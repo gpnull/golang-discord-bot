@@ -4,7 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type TimekeepingExtra struct {
+type TimekeepingExtraStatus struct {
 	ID    primitive.ObjectID `bson:"_id,omitempty"`
 	Day   string             `bson:"day"`
 	Start primitive.DateTime `bson:"start"`

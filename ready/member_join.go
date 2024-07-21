@@ -14,14 +14,15 @@ import (
 func GuildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberAdd,
 	dbClient *database.MongoClient, autoRoleId, welcomeChannelId string) {
 	user := models.User{
-		DiscordID:  m.User.ID,
-		Username:   m.User.Username,
-		Email:      m.User.Email,
-		Avatar:     m.User.Avatar,
-		Locale:     m.User.Locale,
-		GlobalName: m.User.GlobalName,
-		Verified:   m.User.Verified,
-		Banner:     m.User.Banner,
+		DiscordID:            m.User.ID,
+		Username:             m.User.Username,
+		Email:                m.User.Email,
+		Avatar:               m.User.Avatar,
+		Locale:               m.User.Locale,
+		GlobalName:           m.User.GlobalName,
+		Verified:             m.User.Verified,
+		Banner:               m.User.Banner,
+		TimekeepingChannelID: "",
 	}
 
 	if err := dbClient.CreateUser(context.Background(), &user); err != nil {

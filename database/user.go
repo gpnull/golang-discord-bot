@@ -19,3 +19,11 @@ func (mc *MongoClient) CreateUser(ctx context.Context, user *models.User) error 
 	}
 	return nil
 }
+
+func (mc *MongoClient) UpdateUserChannelID(ctx context.Context, discordId, timekeepingChannelId string) error {
+	filter := bson.M{"discord_id": discordId}
+	update := bson.M{"$set": bson.M{"timekeeping_channel_id": timekeepingChannelId}}
+
+	_, err := mc.users.UpdateOne(ctx, filter, update)
+	return err
+}

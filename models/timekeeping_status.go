@@ -4,7 +4,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type Timekeeping struct {
+type TimekeepingStatus struct {
 	ID       string                `bson:"_id,omitempty"`
 	ButtonID string                `bson:"button_id"`
 	Label    string                `bson:"label"`

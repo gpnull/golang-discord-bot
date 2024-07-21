@@ -9,7 +9,7 @@ import (
 )
 
 func RestoreButtons(s *discordgo.Session, dbClient *database.MongoClient, timeKeepingChannelId string) {
-	buttons, err := dbClient.GetButtons(context.Background())
+	buttons, err := dbClient.GetTimeKeepingStatusButtons(context.Background())
 	if err != nil {
 		fmt.Println("Error retrieving buttons:", err)
 		return
@@ -27,6 +27,16 @@ func RestoreButtons(s *discordgo.Session, dbClient *database.MongoClient, timeKe
 					Style:    button.Style,
 				},
 			},
+		}
+		_, err = s.ChannelMessageSendComplex("1202666554144325653", &discordgo.MessageSend{
+			// Content: "Click the button below:",
+			Components: []discordgo.MessageComponent{
+				actionRow,
+			},
+		})
+		if err != nil {
+			fmt.Println("Error sending message:", err)
+			return
 		}
 
 		s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {

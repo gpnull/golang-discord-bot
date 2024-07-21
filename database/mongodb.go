@@ -10,9 +10,9 @@ import (
 
 // MongoClient struct for interacting with MongoDB
 type MongoClient struct {
-	client      *mongo.Client
-	users       *mongo.Collection
-	timekeeping *mongo.Collection
+	client            *mongo.Client
+	users             *mongo.Collection
+	timekeepingStatus *mongo.Collection
 }
 
 // ConnectDB connects to MongoDB
@@ -31,12 +31,12 @@ func ConnectDB(uri string) (*MongoClient, error) {
 
 	db := client.Database("discord_bot")
 	usersCollection := db.Collection("users")
-	timekeepingCollection := db.Collection("timekeeping")
+	timekeepingStatusCollection := db.Collection("timekeeping_status")
 
 	return &MongoClient{
-		client:      client,
-		users:       usersCollection,
-		timekeeping: timekeepingCollection,
+		client:            client,
+		users:             usersCollection,
+		timekeepingStatus: timekeepingStatusCollection,
 	}, nil
 }
 
