@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
@@ -58,7 +57,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		return
 	}
 
-	err = dbClient.UpdateUserChannelID(context.Background(), buttonID, timekeeping_channel.ID)
+	err = dbClient.UpdateUserChannelID(buttonID, timekeeping_channel.ID)
 	if err != nil {
 		fmt.Println("Error updating user channel ID:", err)
 		return
@@ -106,7 +105,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "wrong",
+					Content: "wrong1",
 					Flags:   discordgo.MessageFlagsEphemeral,
 				},
 			})
@@ -137,7 +136,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "wrong",
+					Content: "wrong2",
 					Flags:   discordgo.MessageFlagsEphemeral,
 				},
 			})

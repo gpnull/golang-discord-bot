@@ -1,7 +1,6 @@
 package ready
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"time"
@@ -27,7 +26,7 @@ func GuildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberAdd,
 		TimekeepingChannelID: "",
 	}
 
-	if err := db.CreateUser(context.Background(), &user); err != nil {
+	if err := db.CreateUser(&user); err != nil {
 		fmt.Println("Error saving member information:", err)
 		return
 	}
