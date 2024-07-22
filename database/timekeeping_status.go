@@ -1,39 +1,35 @@
 package database
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/gpnull/golang-github.com/models"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
-func (mc *MongoClient) SaveTimeKeepingStatusButton(ctx context.Context, timekeeping *models.TimekeepingStatus) error {
-	filter := bson.M{"_id": timekeeping.ID}
-	update := bson.M{"$set": timekeeping}
-	_, err := mc.timekeepingStatus.UpdateOne(ctx, filter, update, options.Update().SetUpsert(true))
-	if err != nil {
-		return fmt.Errorf("failed to create/update button: %v", err)
+// Define the Database struct
+type Database struct {
+	DB *gorm.DB
+}
+
+// SaveTimeKeepingStatusButton saves or updates a timekeeping status button in SQL database
+func (db *Database) SaveTimeKeepingStatusButton(timekeeping *models.TimekeepingStatus) error {
+	result := db.DB.Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(timekeeping)
+	if result.Error != nil {
+		return fmt.Errorf("failed to create/update button: %v", result.Error)
 	}
 	return nil
 }
 
-func (mc *MongoClient) GetTimeKeepingStatusButtons(ctx context.Context) ([]*models.TimekeepingStatus, error) {
-	cursor, err := mc.timekeepingStatus.Find(ctx, bson.M{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve buttons: %v", err)
-	}
-	defer cursor.Close(ctx)
-
+// GetTimeKeepingStatusButtons retrieves all timekeeping status buttons from SQL database
+func (db *Database) GetTimeKeepingStatusButtons() ([]*models.TimekeepingStatus, error) {
 	var buttons []*models.TimekeepingStatus
-	for cursor.Next(ctx) {
-		var button models.TimekeepingStatus
-		if err := cursor.Decode(&button); err != nil {
-			return nil, fmt.Errorf("failed to decode button: %v", err)
-		}
-		buttons = append(buttons, &button)
+	result := db.DB.Find(&buttons)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to retrieve buttons: %v", result.Error)
 	}
-
 	return buttons, nil
 }

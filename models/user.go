@@ -1,17 +1,23 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"gorm.io/gorm"
+)
 
-// User struct represents a Discord user in MongoDB
+// User struct represents a Discord user in SQL database
 type User struct {
-	ID                   primitive.ObjectID `bson:"_id,omitempty"`
-	DiscordID            string             `bson:"discord_id"`
-	Username             string             `bson:"username"`
-	Email                string             `bson:"email"`
-	Avatar               string             `bson:"avatar"`
-	Locale               string             `bson:"locale"`
-	GlobalName           string             `bson:"global_name"`
-	Verified             bool               `bson:"verified"`
-	Banner               string             `bson:"banner"`
-	TimekeepingChannelID string             `bson:"timekeeping_channel_id"`
+	gorm.Model
+	DiscordID            string `gorm:"type:varchar(255);uniqueIndex"`
+	Username             string
+	Email                string
+	Avatar               string
+	Locale               string
+	GlobalName           string
+	Verified             bool
+	Banner               string
+	TimekeepingChannelID string
+}
+
+func (User) TableName() string {
+	return "user"
 }

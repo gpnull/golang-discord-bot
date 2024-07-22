@@ -1,15 +1,16 @@
 package pkg
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gpnull/golang-github.com/database"
+	"gorm.io/gorm"
 )
 
-func RestoreButtons(s *discordgo.Session, dbClient *database.MongoClient, timeKeepingChannelId string) {
-	buttons, err := dbClient.GetTimeKeepingStatusButtons(context.Background())
+func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelId string) {
+	db := &database.Database{DB: dbClient}
+	buttons, err := db.GetTimeKeepingStatusButtons()
 	if err != nil {
 		fmt.Println("Error retrieving buttons:", err)
 		return
@@ -29,7 +30,6 @@ func RestoreButtons(s *discordgo.Session, dbClient *database.MongoClient, timeKe
 			},
 		}
 		_, err = s.ChannelMessageSendComplex("1202666554144325653", &discordgo.MessageSend{
-			// Content: "Click the button below:",
 			Components: []discordgo.MessageComponent{
 				actionRow,
 			},

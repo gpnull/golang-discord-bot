@@ -15,12 +15,9 @@ func init() {
 }
 
 func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
-	dbClient, err := database.ConnectDB(util.Config.MongoURI)
-	if err != nil {
-		fmt.Println("Error connecting to MongoDB:", err)
-		return
-	}
-	defer dbClient.DisconnectDB(context.Background())
+	database.ConnectDB(util.Config.DbURL)
+	defer database.CloseDB()
+	dbClient := &database.Database{DB: database.DB}
 
 	if len(args) != 2 {
 		s.ChannelMessageSend(m.ChannelID, "Usage: .createTimekeeping <name_of_register> <id_of_register>")
@@ -89,13 +86,12 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 	}
 
 	timekeepingStatus := &models.TimekeepingStatus{
-		ID:       buttonID,
 		ButtonID: buttonID,
 		Label:    buttonName,
 		Style:    discordgo.PrimaryButton,
 	}
 
-	err = dbClient.SaveTimeKeepingStatusButton(context.Background(), timekeepingStatus)
+	err = dbClient.SaveTimeKeepingStatusButton(timekeepingStatus)
 	if err != nil {
 		fmt.Println("Error saving button information:", err)
 		return

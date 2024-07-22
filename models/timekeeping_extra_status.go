@@ -1,12 +1,18 @@
 package models
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+
+	"gorm.io/gorm"
 )
 
 type TimekeepingExtraStatus struct {
-	ID    primitive.ObjectID `bson:"_id,omitempty"`
-	Day   string             `bson:"day"`
-	Start primitive.DateTime `bson:"start"`
-	End   primitive.DateTime `bson:"end"`
+	gorm.Model
+	Day   string
+	Start time.Time
+	End   time.Time
+}
+
+func (TimekeepingExtraStatus) TableName() string {
+	return "timekeeping_extra_status"
 }

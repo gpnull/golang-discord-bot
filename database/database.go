@@ -1,50 +1,42 @@
 package database
 
 import (
-	"context"
-	"fmt"
+	"log"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/gpnull/golang-github.com/models"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-// MongoClient struct for interacting with MongoDB
-type MongoClient struct {
-	client            *mongo.Client
-	users             *mongo.Collection
-	timekeepingStatus *mongo.Collection
+var DB *gorm.DB
+
+func ConnectDB(connectionString string) {
+	var err error
+	DB, err = gorm.Open(mysql.Open(connectionString), &gorm.Config{
+		Logger:                                   logger.Default.LogMode(logger.Info),
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
 }
 
-// ConnectDB connects to MongoDB
-func ConnectDB(uri string) (*MongoClient, error) {
-	clientOptions := options.Client().ApplyURI(uri)
-	client, err := mongo.Connect(context.Background(), clientOptions)
+func Migrate() {
+	err := DB.AutoMigrate(
+		&models.User{},
+		&models.TimekeepingStatus{},
+		&models.TimekeepingExtraStatus{},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to MongoDB: %v", err)
+		log.Fatalf("Failed to migrate database: %v", err)
 	}
-
-	// Ping the database to verify connection
-	err = client.Ping(context.Background(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to ping MongoDB: %v", err)
-	}
-
-	db := client.Database("discord_bot")
-	usersCollection := db.Collection("users")
-	timekeepingStatusCollection := db.Collection("timekeeping_status")
-
-	return &MongoClient{
-		client:            client,
-		users:             usersCollection,
-		timekeepingStatus: timekeepingStatusCollection,
-	}, nil
 }
 
-// DisconnectDB disconnects from MongoDB
-func (mc *MongoClient) DisconnectDB(ctx context.Context) error {
-	err := mc.client.Disconnect(ctx)
+func CloseDB() {
+	sqlDB, err := DB.DB()
 	if err != nil {
-		return fmt.Errorf("failed to disconnect from MongoDB: %v", err)
+		log.Printf("Failed to close database connection: %v", err)
 	}
-	return nil
+	sqlDB.Close()
 }

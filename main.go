@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -29,12 +27,16 @@ func main() {
 	}
 
 	// Connect to MongoDB
-	dbClient, err := database.ConnectDB(util.Config.MongoURI)
-	if err != nil {
-		fmt.Println("Error connecting to MongoDB:", err)
-		return
-	}
-	defer dbClient.DisconnectDB(context.Background())
+	// dbClient, err := database.ConnectDB(util.Config.MongoURI)
+	// if err != nil {
+	// 	fmt.Println("Error connecting to MongoDB:", err)
+	// 	return
+	// }
+	// defer dbClient.DisconnectDB(context.Background())
+	database.ConnectDB(util.Config.DbURL)
+	defer database.CloseDB()
+	database.Migrate()
+	dbClient := database.DB
 
 	// Restore previously created buttons
 	pkg.RestoreButtons(s, dbClient, util.Config.TimekeepingChannelID)

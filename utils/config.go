@@ -6,8 +6,8 @@ import (
 )
 
 type configuration struct {
-	Token    string `json:"token"`
-	MongoURI string `json:"mongo_uri"`
+	Token string `json:"token"`
+	DbURL string `json:"db_url"`
 
 	WelcomeChannelID     string `json:"welcome_channel_id"`
 	LeaveChannelID       string `json:"leave_channel_id"`

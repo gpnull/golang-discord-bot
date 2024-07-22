@@ -9,10 +9,12 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/gpnull/golang-github.com/database"
 	"github.com/gpnull/golang-github.com/models"
+	"gorm.io/gorm"
 )
 
 func GuildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberAdd,
-	dbClient *database.MongoClient, autoRoleId, welcomeChannelId string) {
+	dbClient *gorm.DB, autoRoleId, welcomeChannelId string) {
+	db := &database.Database{DB: dbClient}
 	user := models.User{
 		DiscordID:            m.User.ID,
 		Username:             m.User.Username,
@@ -25,7 +27,7 @@ func GuildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberAdd,
 		TimekeepingChannelID: "",
 	}
 
-	if err := dbClient.CreateUser(context.Background(), &user); err != nil {
+	if err := db.CreateUser(context.Background(), &user); err != nil {
 		fmt.Println("Error saving member information:", err)
 		return
 	}

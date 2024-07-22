@@ -5,25 +5,22 @@ import (
 	"fmt"
 
 	"github.com/gpnull/golang-github.com/models"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"gorm.io/gorm/clause"
 )
 
-// CreateUser creates a new user in MongoDB or updates an existing user if the discord_id already exists
-func (mc *MongoClient) CreateUser(ctx context.Context, user *models.User) error {
-	filter := bson.M{"discord_id": user.DiscordID}
-	update := bson.M{"$set": user}
-	_, err := mc.users.UpdateOne(ctx, filter, update, options.Update().SetUpsert(true))
-	if err != nil {
-		return fmt.Errorf("failed to create/update user: %v", err)
+// CreateUser creates a new user in SQL database or updates an existing user if the discord_id already exists
+func (db *Database) CreateUser(ctx context.Context, user *models.User) error {
+	result := db.DB.Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(user)
+	if result.Error != nil {
+		return fmt.Errorf("failed to create/update user: %v", result.Error)
 	}
 	return nil
 }
 
-func (mc *MongoClient) UpdateUserChannelID(ctx context.Context, discordId, timekeepingChannelId string) error {
-	filter := bson.M{"discord_id": discordId}
-	update := bson.M{"$set": bson.M{"timekeeping_channel_id": timekeepingChannelId}}
-
-	_, err := mc.users.UpdateOne(ctx, filter, update)
-	return err
+// UpdateUserChannelID updates the timekeeping_channel_id for a user in SQL database
+func (db *Database) UpdateUserChannelID(ctx context.Context, discordId, timekeepingChannelId string) error {
+	result := db.DB.Model(&models.User{}).Where("discord_id = ?", discordId).Update("timekeeping_channel_id", timekeepingChannelId)
+	return result.Error
 }

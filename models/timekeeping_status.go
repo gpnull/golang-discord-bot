@@ -2,11 +2,16 @@ package models
 
 import (
 	"github.com/bwmarrin/discordgo"
+	"gorm.io/gorm"
 )
 
 type TimekeepingStatus struct {
-	ID       string                `bson:"_id,omitempty"`
-	ButtonID string                `bson:"button_id"`
-	Label    string                `bson:"label"`
-	Style    discordgo.ButtonStyle `bson:"style"`
+	gorm.Model
+	ButtonID string `gorm:"type:varchar(255);uniqueIndex"`
+	Label    string
+	Style    discordgo.ButtonStyle
+}
+
+func (TimekeepingStatus) TableName() string {
+	return "timekeeping_status"
 }
