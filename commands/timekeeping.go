@@ -37,6 +37,24 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		Type:     discordgo.ChannelTypeGuildText,
 		ParentID: categoryID,
 		Topic:    buttonID,
+		PermissionOverwrites: []*discordgo.PermissionOverwrite{
+			// {
+			// 	ID:    "1202667195944009779", // Role ID
+			// 	Type:  discordgo.PermissionOverwriteTypeRole,
+			// 	Allow: discordgo.PermissionViewChannel | discordgo.PermissionManageChannels, // Allow view and manage channels
+			// },
+			{
+				ID:    args[1], // User ID
+				Type:  discordgo.PermissionOverwriteTypeMember,
+				Allow: discordgo.PermissionViewChannel,
+				Deny:  discordgo.PermissionManageChannels | discordgo.PermissionSendMessages, // Deny permission to manage channels
+			},
+			{
+				ID:   m.GuildID, // Default role (everyone)
+				Type: discordgo.PermissionOverwriteTypeRole,
+				Deny: discordgo.PermissionViewChannel,
+			},
+		},
 	})
 	if err != nil {
 		s.ChannelMessageSend(m.ChannelID, "Cannot create new channel: "+err.Error())
