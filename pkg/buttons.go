@@ -5,6 +5,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gpnull/golang-github.com/database"
+	handler "github.com/gpnull/golang-github.com/handlers"
 	"gorm.io/gorm"
 )
 
@@ -39,52 +40,62 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 			return
 		}
 
+		buttonRestore := discordgo.Button{
+			Label:    button.Label,
+			CustomID: button.ButtonID,
+			Style:    button.Style,
+		}
+
 		s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			if i.Type != discordgo.InteractionMessageComponent {
-				return
-			}
-
-			if i.MessageComponentData().CustomID != button.ButtonID {
-				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-					Type: discordgo.InteractionResponseChannelMessageWithSource,
-					Data: &discordgo.InteractionResponseData{
-						Content: "wrong",
-						Flags:   discordgo.MessageFlagsEphemeral,
-					},
-				})
-				return
-			}
-
-			if i.Member.User.ID == button.ButtonID {
-				if button.Style == discordgo.PrimaryButton {
-					button.Style = discordgo.DangerButton
-					s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-						Type: discordgo.InteractionResponseUpdateMessage,
-						Data: &discordgo.InteractionResponseData{
-							Content:    "nice",
-							Components: []discordgo.MessageComponent{actionRow},
-						},
-					})
-				} else {
-					button.Style = discordgo.PrimaryButton
-					s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-						Type: discordgo.InteractionResponseUpdateMessage,
-						Data: &discordgo.InteractionResponseData{
-							Content:    "bye",
-							Components: []discordgo.MessageComponent{actionRow},
-						},
-					})
-				}
-			} else {
-				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-					Type: discordgo.InteractionResponseChannelMessageWithSource,
-					Data: &discordgo.InteractionResponseData{
-						Content: "wrong",
-						Flags:   discordgo.MessageFlagsEphemeral,
-					},
-				})
-			}
+			handler.HandleTimekeepingInteraction(s, i, button.ButtonID, &buttonRestore, actionRow)
 		})
+
+		// s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		// 	if i.Type != discordgo.InteractionMessageComponent {
+		// 		return
+		// 	}
+
+		// 	if i.MessageComponentData().CustomID != button.ButtonID {
+		// 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		// 			Type: discordgo.InteractionResponseChannelMessageWithSource,
+		// 			Data: &discordgo.InteractionResponseData{
+		// 				Content: "wrong1",
+		// 				Flags:   discordgo.MessageFlagsEphemeral,
+		// 			},
+		// 		})
+		// 		return
+		// 	}
+
+		// 	if i.Member.User.ID == button.ButtonID {
+		// 		if button.Style == discordgo.PrimaryButton {
+		// 			button.Style = discordgo.DangerButton
+		// 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		// 				Type: discordgo.InteractionResponseUpdateMessage,
+		// 				Data: &discordgo.InteractionResponseData{
+		// 					Content:    "nice",
+		// 					Components: []discordgo.MessageComponent{actionRow},
+		// 				},
+		// 			})
+		// 		} else {
+		// 			button.Style = discordgo.PrimaryButton
+		// 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		// 				Type: discordgo.InteractionResponseUpdateMessage,
+		// 				Data: &discordgo.InteractionResponseData{
+		// 					Content:    "bye",
+		// 					Components: []discordgo.MessageComponent{actionRow},
+		// 				},
+		// 			})
+		// 		}
+		// 	} else {
+		// 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		// 			Type: discordgo.InteractionResponseChannelMessageWithSource,
+		// 			Data: &discordgo.InteractionResponseData{
+		// 				Content: "wrong2",
+		// 				Flags:   discordgo.MessageFlagsEphemeral,
+		// 			},
+		// 		})
+		// 	}
+		// })
 	}
 }
 
