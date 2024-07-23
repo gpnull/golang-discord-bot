@@ -7,10 +7,12 @@ import (
 
 type TimekeepingStatus struct {
 	gorm.Model
-	ButtonID string `gorm:"type:varchar(255);uniqueIndex"`
-	Label    string
-	Style    discordgo.ButtonStyle
-	Content  string
+	ButtonID                string `gorm:"type:varchar(255);uniqueIndex"`
+	Label                   string
+	Style                   discordgo.ButtonStyle
+	Content                 string
+	TimekeepingChannelID    string
+	TimekeepingLogChannelID string
 }
 
 func (TimekeepingStatus) TableName() string {

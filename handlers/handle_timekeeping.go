@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/gpnull/golang-github.com/database"
+	"github.com/gpnull/golang-github.com/models"
 	util "github.com/gpnull/golang-github.com/utils"
 )
 
@@ -16,28 +18,45 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 	now := util.GetDayTimeNow()
 
 	if i.Member.User.ID == buttonID {
+		dbClient := &database.Database{DB: database.DB}
+		timekeepingStatus := &models.TimekeepingStatus{
+			ButtonID: buttonID,
+			Label:    button.Label,
+			Style:    button.Style,
+			Content:  "",
+		}
+
+		var content string
 		if button.Style == discordgo.PrimaryButton {
 			button.Style = discordgo.DangerButton
 			timekeepingStart(s, now, channelID)
-
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseUpdateMessage,
-				Data: &discordgo.InteractionResponseData{
-					Content:    "Work has started.",
-					Components: []discordgo.MessageComponent{actionRow},
-				},
-			})
+			content = "Work has started."
 		} else {
 			button.Style = discordgo.PrimaryButton
 			timekeepingEnd(s, now, channelID)
+			content = "Work has ended."
+		}
 
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseUpdateMessage,
-				Data: &discordgo.InteractionResponseData{
-					Content:    "Work has ended.",
-					Components: []discordgo.MessageComponent{actionRow},
-				},
-			})
+		// Update the button style in the actionRow
+		actionRow.Components[0] = button
+
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseUpdateMessage,
+			Data: &discordgo.InteractionResponseData{
+				Content:    content,
+				Components: []discordgo.MessageComponent{actionRow},
+			},
+		})
+
+		timekeepingStatus.Style = button.Style
+		timekeepingStatus.Content = content
+
+		fmt.Println("timekeepingStatus.Style: ", timekeepingStatus.Style)
+
+		// Save the timekeeping status
+		err := dbClient.SaveTimeKeepingStatusButton(timekeepingStatus)
+		if err != nil {
+			fmt.Println("Error saving button information:", err)
 		}
 	} else {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{

@@ -6,6 +6,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/gpnull/golang-github.com/database"
 	handler "github.com/gpnull/golang-github.com/handlers"
+	util "github.com/gpnull/golang-github.com/utils"
 	"gorm.io/gorm"
 )
 
@@ -29,7 +30,8 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 				},
 			},
 		}
-		_, err = s.ChannelMessageSendComplex("1202666554144325653", &discordgo.MessageSend{
+		_, err = s.ChannelMessageSendComplex(util.Config.TimekeepingChannelID, &discordgo.MessageSend{
+			Content: button.Content,
 			Components: []discordgo.MessageComponent{
 				actionRow,
 			},
