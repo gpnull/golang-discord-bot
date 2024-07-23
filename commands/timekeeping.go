@@ -98,53 +98,8 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 	}
 
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		handler.HandleTimekeepingInteraction(s, i, buttonID, &button, actionRow)
+		if i.MessageComponentData().CustomID == buttonID {
+			handler.HandleTimekeepingInteraction(s, i, buttonID, &button, actionRow)
+		}
 	})
-
-	// s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	// 	if i.Type != discordgo.InteractionMessageComponent {
-	// 		return
-	// 	}
-
-	// 	if i.MessageComponentData().CustomID != buttonID {
-	// 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-	// 			Type: discordgo.InteractionResponseChannelMessageWithSource,
-	// 			Data: &discordgo.InteractionResponseData{
-	// 				Content: "wrong1",
-	// 				Flags:   discordgo.MessageFlagsEphemeral,
-	// 			},
-	// 		})
-	// 		return
-	// 	}
-
-	// 	if i.Member.User.ID == buttonID {
-	// 		if button.Style == discordgo.PrimaryButton {
-	// 			button.Style = discordgo.DangerButton
-	// 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-	// 				Type: discordgo.InteractionResponseUpdateMessage,
-	// 				Data: &discordgo.InteractionResponseData{
-	// 					Content:    "nice",
-	// 					Components: []discordgo.MessageComponent{actionRow},
-	// 				},
-	// 			})
-	// 		} else {
-	// 			button.Style = discordgo.PrimaryButton
-	// 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-	// 				Type: discordgo.InteractionResponseUpdateMessage,
-	// 				Data: &discordgo.InteractionResponseData{
-	// 					Content:    "bye",
-	// 					Components: []discordgo.MessageComponent{actionRow},
-	// 				},
-	// 			})
-	// 		}
-	// 	} else {
-	// 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-	// 			Type: discordgo.InteractionResponseChannelMessageWithSource,
-	// 			Data: &discordgo.InteractionResponseData{
-	// 				Content: "wrong2",
-	// 				Flags:   discordgo.MessageFlagsEphemeral,
-	// 			},
-	// 		})
-	// 	}
-	// })
 }

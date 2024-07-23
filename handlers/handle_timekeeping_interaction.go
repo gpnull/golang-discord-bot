@@ -4,7 +4,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.InteractionCreate, buttonID string, button *discordgo.Button, actionRow discordgo.ActionsRow) {
+func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.InteractionCreate,
+	buttonID string, button *discordgo.Button, actionRow discordgo.ActionsRow) {
 	if i.Type != discordgo.InteractionMessageComponent {
 		return
 	}
