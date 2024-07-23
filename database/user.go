@@ -7,7 +7,6 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-// CreateUser creates a new user in SQL database or updates an existing user if the discord_id already exists
 func (db *Database) CreateUser(user *models.User) error {
 	result := db.DB.Clauses(clause.OnConflict{
 		UpdateAll: true,
@@ -18,8 +17,16 @@ func (db *Database) CreateUser(user *models.User) error {
 	return nil
 }
 
-// UpdateUserChannelID updates the timekeeping_channel_id for a user in SQL database
 func (db *Database) UpdateUserChannelID(discordId, timekeepingChannelId string) error {
 	result := db.DB.Model(&models.User{}).Where("discord_id = ?", discordId).Update("timekeeping_channel_id", timekeepingChannelId)
 	return result.Error
+}
+
+func (db *Database) GetChannelIDByDiscordID(discordId string) string {
+	var user models.User
+	result := db.DB.Model(&models.User{}).Where("discord_id = ?", discordId).First(&user)
+	if result.Error != nil {
+		return ""
+	}
+	return user.TimekeepingChannelID
 }

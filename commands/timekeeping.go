@@ -99,7 +99,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if i.MessageComponentData().CustomID == buttonID {
-			handler.HandleTimekeepingInteraction(s, i, buttonID, &button, actionRow)
+			handler.HandleTimekeepingInteraction(s, i, buttonID, &button, actionRow, timekeeping_channel.ID)
 		}
 	})
 }

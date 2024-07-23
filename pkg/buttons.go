@@ -17,7 +17,6 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 		return
 	}
 
-	// Clear existing buttons from the UI
 	clearExistingButtons(s, timeKeepingChannelId)
 
 	for _, button := range buttons {
@@ -46,9 +45,15 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 			Style:    button.Style,
 		}
 
+		channelID := db.GetChannelIDByDiscordID(button.ButtonID)
+		if channelID == "" {
+			fmt.Println("Error: Channel ID not found for user")
+			return
+		}
+
 		s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			if i.MessageComponentData().CustomID == button.ButtonID {
-				handler.HandleTimekeepingInteraction(s, i, button.ButtonID, &buttonRestore, actionRow)
+				handler.HandleTimekeepingInteraction(s, i, button.ButtonID, &buttonRestore, actionRow, channelID)
 			}
 		})
 	}
