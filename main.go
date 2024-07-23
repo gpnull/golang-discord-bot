@@ -26,13 +26,6 @@ func main() {
 		log.Panicf("Error creating session: %s", err)
 	}
 
-	// Connect to MongoDB
-	// dbClient, err := database.ConnectDB(util.Config.MongoURI)
-	// if err != nil {
-	// 	fmt.Println("Error connecting to MongoDB:", err)
-	// 	return
-	// }
-	// defer dbClient.DisconnectDB(context.Background())
 	database.ConnectDB(util.Config.DbURL)
 	defer database.CloseDB()
 	database.Migrate()

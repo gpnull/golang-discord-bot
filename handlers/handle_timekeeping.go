@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/gpnull/golang-github.com/utils"
+	util "github.com/gpnull/golang-github.com/utils"
 )
 
 func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.InteractionCreate,
@@ -13,7 +13,7 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 		return
 	}
 
-	now := utils.GetDayTimeNow()
+	now := util.GetDayTimeNow()
 
 	if i.Member.User.ID == buttonID {
 		if button.Style == discordgo.PrimaryButton {

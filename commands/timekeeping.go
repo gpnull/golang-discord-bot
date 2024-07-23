@@ -28,7 +28,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 	buttonID := args[1]   // id_of_register
 
 	// Create new channel
-	categoryID := "1202666419519619164"
+	categoryID := util.Config.TimekeepingLogCategoryID
 	timekeeping_channel, err := s.GuildChannelCreateComplex(m.GuildID, discordgo.GuildChannelCreateData{
 		Name:     buttonName,
 		Type:     discordgo.ChannelTypeGuildText,
