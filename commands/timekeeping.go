@@ -75,7 +75,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 	}
 
 	_, err = s.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{
-		// Content: "Click the button below:",
+		Content: "Welcome...",
 		Components: []discordgo.MessageComponent{
 			actionRow,
 		},
@@ -89,6 +89,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		ButtonID: buttonID,
 		Label:    buttonName,
 		Style:    discordgo.PrimaryButton,
+		Content:  "",
 	}
 
 	err = dbClient.SaveTimeKeepingStatusButton(timekeepingStatus)

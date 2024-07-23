@@ -10,6 +10,7 @@ type TimekeepingStatus struct {
 	ButtonID string `gorm:"type:varchar(255);uniqueIndex"`
 	Label    string
 	Style    discordgo.ButtonStyle
+	Content  string
 }
 
 func (TimekeepingStatus) TableName() string {

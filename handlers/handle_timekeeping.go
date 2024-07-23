@@ -51,7 +51,7 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 }
 
 func timekeepingStart(s *discordgo.Session, nowTime, channelId string) {
-	message := fmt.Sprintf("Work has started at: %s", nowTime)
+	message := fmt.Sprintf("🩺 Work has started at: %s", nowTime)
 	_, err := s.ChannelMessageSend(channelId, message)
 	if err != nil {
 		fmt.Println("Error sending message:", err)
@@ -59,7 +59,7 @@ func timekeepingStart(s *discordgo.Session, nowTime, channelId string) {
 }
 
 func timekeepingEnd(s *discordgo.Session, nowTime, channelId string) {
-	message := fmt.Sprintf("Work has ended at: %s", nowTime)
+	message := fmt.Sprintf("💤 Work has ended at: %s", nowTime)
 	_, err := s.ChannelMessageSend(channelId, message)
 	if err != nil {
 		fmt.Println("Error sending message:", err)
