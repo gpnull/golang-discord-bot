@@ -32,12 +32,12 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 		var status string
 		if button.Style == discordgo.PrimaryButton {
 			button.Style = discordgo.DangerButton
-			timekeepingStart(s, now, channelID)
+			TimekeepingStart(s, now, channelID)
 			content = "Work has started."
 			status = util.WORKING
 		} else {
 			button.Style = discordgo.PrimaryButton
-			timekeepingEnd(s, now, channelID)
+			TimekeepingEnd(s, now, channelID)
 			content = "Work has ended."
 			status = util.STOPPED
 		}
@@ -73,7 +73,7 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 	}
 }
 
-func timekeepingStart(s *discordgo.Session, nowTime, channelId string) {
+func TimekeepingStart(s *discordgo.Session, nowTime, channelId string) {
 	message := fmt.Sprintf("🩺 Work has started at: %s", nowTime)
 	_, err := s.ChannelMessageSend(channelId, message)
 	if err != nil {
@@ -81,7 +81,7 @@ func timekeepingStart(s *discordgo.Session, nowTime, channelId string) {
 	}
 }
 
-func timekeepingEnd(s *discordgo.Session, nowTime, channelId string) {
+func TimekeepingEnd(s *discordgo.Session, nowTime, channelId string) {
 	message := fmt.Sprintf("💤 Work has ended at: %s", nowTime)
 	_, err := s.ChannelMessageSend(channelId, message)
 	if err != nil {
@@ -90,15 +90,46 @@ func timekeepingEnd(s *discordgo.Session, nowTime, channelId string) {
 }
 
 func HandleResetTimekeepingStatus(s *discordgo.Session) {
-	database.ConnectDB(util.Config.DbURL)
+	if database.DB == nil {
+		fmt.Println("Database connection is not initialized")
+		return
+	}
+	// Check if the database connection is initialized
+	if database.DB == nil {
+		fmt.Println("Database connection is not initialized, reconnecting...")
+		database.ConnectDB(util.Config.DbURL)
+	}
+
+	sqlDB, err := database.DB.DB()
+	if err != nil {
+		fmt.Println("Error getting database connection:", err)
+		return
+	}
+
+	// Check if the database connection is open
+	if err := sqlDB.Ping(); err != nil {
+		fmt.Println("Database connection is not open, reconnecting...")
+		database.ConnectDB(util.Config.DbURL)
+		sqlDB, err = database.DB.DB()
+		if err != nil {
+			fmt.Println("Error getting database connection after reconnecting:", err)
+			return
+		}
+		if err := sqlDB.Ping(); err != nil {
+			fmt.Println("Database connection is still not open after reconnecting:", err)
+			return
+		}
+	}
+
 	dbClient := &database.Database{DB: database.DB}
-	defer database.CloseDB()
 
 	buttons, err := dbClient.GetTimeKeepingStatusButtons()
 	if err != nil {
 		fmt.Println("Error retrieving buttons:", err)
 		return
 	}
+
+	now := util.GetDayTimeNow()
 
 	for _, button := range buttons {
 		if button.Status == util.WORKING {
@@ -109,6 +140,8 @@ func HandleResetTimekeepingStatus(s *discordgo.Session) {
 			if err != nil {
 				fmt.Println("Error updating button information:", err)
 			}
+
+			TimekeepingEnd(s, now, button.TimekeepingLogChannelID)
 		}
 	}
 }
