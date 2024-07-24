@@ -54,7 +54,7 @@ func main() {
 	}
 
 	// Call ScheduleWelcomeMessages function from cron.go
-	cron.ScheduleWelcomeMessages(s, util.Config.WelcomeChannelID)
+	cron.ScheduleWelcomeMessages(s)
 
 	// Wait for os terminate events, cleanly close connection when encountered
 	closeChan := make(chan os.Signal, 1)

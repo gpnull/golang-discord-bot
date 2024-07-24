@@ -11,7 +11,7 @@ import (
 	cron "github.com/robfig/cron/v3"
 )
 
-func ScheduleWelcomeMessages(s *discordgo.Session, welcomeChannelId string) {
+func ScheduleWelcomeMessages(s *discordgo.Session) {
 	// Create a new cron instance
 	c := cron.New(cron.WithLocation(time.FixedZone("GMT+7", 7*60*60)))
 
@@ -23,47 +23,47 @@ func ScheduleWelcomeMessages(s *discordgo.Session, welcomeChannelId string) {
 	})
 
 	c.AddFunc("00 02 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	c.AddFunc("00 04 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	c.AddFunc("00 06 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	c.AddFunc("00 08 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	c.AddFunc("00 10 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	c.AddFunc("00 12 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	c.AddFunc("00 14 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	c.AddFunc("00 16 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	c.AddFunc("00 18 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	c.AddFunc("00 20 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	c.AddFunc("00 22 * * *", func() {
-		s.ChannelMessageSend(welcomeChannelId, "Welcome!")
+		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 	})
 
 	// Start the cron scheduler
