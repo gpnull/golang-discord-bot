@@ -90,38 +90,9 @@ func TimekeepingEnd(s *discordgo.Session, nowTime, channelId string) {
 }
 
 func HandleResetTimekeepingStatus(s *discordgo.Session) {
-	if database.DB == nil {
-		fmt.Println("Database connection is not initialized")
-		return
-	}
-	// Check if the database connection is initialized
-	if database.DB == nil {
-		fmt.Println("Database connection is not initialized, reconnecting...")
-		database.ConnectDB(util.Config.DbURL)
-	}
-
-	sqlDB, err := database.DB.DB()
-	if err != nil {
-		fmt.Println("Error getting database connection:", err)
-		return
-	}
-
-	// Check if the database connection is open
-	if err := sqlDB.Ping(); err != nil {
-		fmt.Println("Database connection is not open, reconnecting...")
-		database.ConnectDB(util.Config.DbURL)
-		sqlDB, err = database.DB.DB()
-		if err != nil {
-			fmt.Println("Error getting database connection after reconnecting:", err)
-			return
-		}
-		if err := sqlDB.Ping(); err != nil {
-			fmt.Println("Database connection is still not open after reconnecting:", err)
-			return
-		}
-	}
-
+	database.ConnectDB(util.Config.DbURL)
 	dbClient := &database.Database{DB: database.DB}
+	defer database.CloseDB()
 
 	buttons, err := dbClient.GetTimeKeepingStatusButtons()
 	if err != nil {
