@@ -25,7 +25,7 @@ func Migrate() {
 	err := DB.AutoMigrate(
 		&models.User{},
 		&models.TimekeepingStatus{},
-		&models.TimekeepingExtraStatus{},
+		&models.TimekeepingOvertimeStatus{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
