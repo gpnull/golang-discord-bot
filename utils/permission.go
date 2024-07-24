@@ -4,10 +4,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HasPermissionClear(m *discordgo.MessageCreate, useBotId string) bool {
-	// Check if useBotId exists in m.Member.Roles
+func HasPermissionClear(m *discordgo.MessageCreate, roleUseBotId string) bool {
+	// Check if roleUseBotId exists in m.Member.Roles
 	for _, role := range m.Member.Roles {
-		if role == useBotId {
+		if role == roleUseBotId {
 			return true
 		}
 	}

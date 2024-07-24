@@ -15,9 +15,7 @@ func init() {
 }
 
 func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
-	database.ConnectDB(util.Config.DbURL)
 	dbClient := &database.Database{DB: database.DB}
-	defer database.CloseDB()
 
 	if len(args) != 2 {
 		s.ChannelMessageSend(m.ChannelID, "Usage: .createTimekeeping <name_of_register> <id_of_register>")
@@ -35,11 +33,6 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		ParentID: categoryID,
 		Topic:    buttonID,
 		PermissionOverwrites: []*discordgo.PermissionOverwrite{
-			// {
-			// 	ID:    "1202667195944009779", // Role ID
-			// 	Type:  discordgo.PermissionOverwriteTypeRole,
-			// 	Allow: discordgo.PermissionViewChannel | discordgo.PermissionManageChannels, // Allow view and manage channels
-			// },
 			{
 				ID:    args[1], // User ID
 				Type:  discordgo.PermissionOverwriteTypeMember,
@@ -64,27 +57,6 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		return
 	}
 
-	// button := discordgo.Button{
-	// 	Label:    buttonName,
-	// 	CustomID: buttonID,
-	// 	Style:    discordgo.PrimaryButton,
-	// }
-
-	// actionRow := discordgo.ActionsRow{
-	// 	Components: []discordgo.MessageComponent{button},
-	// }
-
-	// _, err = s.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{
-	// 	Content: "Welcome...",
-	// 	Components: []discordgo.MessageComponent{
-	// 		actionRow,
-	// 	},
-	// })
-	// if err != nil {
-	// 	fmt.Println("Error sending message:", err)
-	// 	return
-	// }
-
 	timekeepingStatus := &models.TimekeepingStatus{
 		ButtonID:                buttonID,
 		Label:                   buttonName,
@@ -92,6 +64,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		Content:                 "Welcome...",
 		TimekeepingChannelID:    util.Config.TimekeepingChannelID,
 		TimekeepingLogChannelID: timekeeping_channel_log.ID,
+		Status:                  util.STOPPED,
 	}
 
 	err = dbClient.SaveTimeKeepingStatusButton(timekeepingStatus)
@@ -101,11 +74,4 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 	}
 
 	pkg.RestoreButtons(s, database.DB, util.Config.TimekeepingChannelID)
-
-	// s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	// 	if i.MessageComponentData().CustomID == buttonID {
-	// 		handler.HandleTimekeepingInteraction(s, i, buttonID, &button, actionRow, timekeeping_channel_log.ID)
-	// 	}
-	// })
-
 }

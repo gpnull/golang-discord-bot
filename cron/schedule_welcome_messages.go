@@ -11,12 +11,12 @@ import (
 	cron "github.com/robfig/cron/v3"
 )
 
-func ScheduleWelcomeMessages(s *discordgo.Session) {
+func ResetTimekeepingStatus(s *discordgo.Session) {
 	// Create a new cron instance
 	c := cron.New(cron.WithLocation(time.FixedZone("GMT+7", 7*60*60)))
 
 	// Schedule the job to run at 0 2 4 6 8 10 12 14 16 18 20 22 GMT+7 daily
-	c.AddFunc("09 11 * * *", func() {
+	c.AddFunc("25 16 * * *", func() {
 		s.ChannelMessageSend(util.Config.TimekeepingChannelID, "Welcome!")
 		handlers.HandleResetTimekeepingStatus(s)
 		pkg.RestoreButtons(s, database.DB, util.Config.TimekeepingChannelID)

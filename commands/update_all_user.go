@@ -10,33 +10,25 @@ import (
 )
 
 func init() {
-	util.Commands["updateAllUser"] = updateAllUser
+	util.Commands["initUsers"] = initUsers
 }
 
-func updateAllUser(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
+func initUsers(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	if !util.HasPermissionClear(m, util.Config.UseBotID) {
 		s.ChannelMessageSend(m.ChannelID, "You do not have permission to use this command.")
 		return
 	}
 
-	// Connect to the database
-	database.ConnectDB(util.Config.DbURL)
-	defer database.CloseDB()
 	dbClient := &database.Database{DB: database.DB}
 
-	// Get the guild ID from the message
 	guildID := m.GuildID
-
-	// Get all members in the guild
 	members, err := s.GuildMembers(guildID, "", 1000)
 	if err != nil {
 		fmt.Println("Error fetching guild members:", err)
 		return
 	}
 
-	// Iterate through each member and create/update user in the database
 	for _, member := range members {
-		// Skip bots
 		if member.User.Bot {
 			continue
 		}

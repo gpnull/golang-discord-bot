@@ -18,9 +18,8 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 	now := util.GetDayTimeNow()
 
 	if i.Member.User.ID == buttonID {
-		database.ConnectDB(util.Config.DbURL)
 		dbClient := &database.Database{DB: database.DB}
-		defer database.CloseDB()
+
 		timekeepingStatus := &models.TimekeepingStatus{
 			ButtonID: buttonID,
 			Label:    button.Label,
@@ -32,12 +31,12 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 		var status string
 		if button.Style == discordgo.PrimaryButton {
 			button.Style = discordgo.DangerButton
-			TimekeepingStart(s, now, channelID)
+			timekeepingStart(s, now, channelID)
 			content = "Work has started."
 			status = util.WORKING
 		} else {
 			button.Style = discordgo.PrimaryButton
-			TimekeepingEnd(s, now, channelID)
+			timekeepingEnd(s, now, channelID)
 			content = "Work has ended."
 			status = util.STOPPED
 		}
@@ -73,7 +72,7 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 	}
 }
 
-func TimekeepingStart(s *discordgo.Session, nowTime, channelId string) {
+func timekeepingStart(s *discordgo.Session, nowTime, channelId string) {
 	message := fmt.Sprintf("🩺 Work has started at: %s", nowTime)
 	_, err := s.ChannelMessageSend(channelId, message)
 	if err != nil {
@@ -81,7 +80,7 @@ func TimekeepingStart(s *discordgo.Session, nowTime, channelId string) {
 	}
 }
 
-func TimekeepingEnd(s *discordgo.Session, nowTime, channelId string) {
+func timekeepingEnd(s *discordgo.Session, nowTime, channelId string) {
 	message := fmt.Sprintf("💤 Work has ended at: %s", nowTime)
 	_, err := s.ChannelMessageSend(channelId, message)
 	if err != nil {
@@ -90,9 +89,7 @@ func TimekeepingEnd(s *discordgo.Session, nowTime, channelId string) {
 }
 
 func HandleResetTimekeepingStatus(s *discordgo.Session) {
-	database.ConnectDB(util.Config.DbURL)
 	dbClient := &database.Database{DB: database.DB}
-	defer database.CloseDB()
 
 	buttons, err := dbClient.GetTimeKeepingStatusButtons()
 	if err != nil {
@@ -106,13 +103,14 @@ func HandleResetTimekeepingStatus(s *discordgo.Session) {
 		if button.Status == util.WORKING {
 			button.Status = util.STOPPED
 			button.Style = discordgo.PrimaryButton
+			button.Content = "Work has ended."
 
 			err := dbClient.SaveTimeKeepingStatusButton(button)
 			if err != nil {
 				fmt.Println("Error updating button information:", err)
+			} else {
+				timekeepingEnd(s, now, button.TimekeepingLogChannelID)
 			}
-
-			TimekeepingEnd(s, now, button.TimekeepingLogChannelID)
 		}
 	}
 }

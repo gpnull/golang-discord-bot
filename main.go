@@ -53,8 +53,7 @@ func main() {
 		log.Panicf("Unable to open session: %s", err)
 	}
 
-	// Call ScheduleWelcomeMessages function from cron.go
-	cron.ScheduleWelcomeMessages(s)
+	cron.ResetTimekeepingStatus(s)
 
 	// Wait for os terminate events, cleanly close connection when encountered
 	closeChan := make(chan os.Signal, 1)
