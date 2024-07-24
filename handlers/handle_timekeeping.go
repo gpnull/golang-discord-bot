@@ -18,7 +18,9 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 	now := util.GetDayTimeNow()
 
 	if i.Member.User.ID == buttonID {
+		database.ConnectDB(util.Config.DbURL)
 		dbClient := &database.Database{DB: database.DB}
+		defer database.CloseDB()
 		timekeepingStatus := &models.TimekeepingStatus{
 			ButtonID: buttonID,
 			Label:    button.Label,
@@ -50,8 +52,6 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 
 		timekeepingStatus.Style = button.Style
 		timekeepingStatus.Content = content
-
-		fmt.Println("timekeepingStatus.Style: ", timekeepingStatus.Style)
 
 		// Save the timekeeping status
 		err := dbClient.SaveTimeKeepingStatusButton(timekeepingStatus)
