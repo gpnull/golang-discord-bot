@@ -14,6 +14,8 @@ func init() {
 	util.Commands["createTimekeeping"] = createTimekeeping
 }
 
+// .createTimekeeping name id_discord time_start time_end
+
 func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	dbClient := &database.Database{DB: database.DB}
 
