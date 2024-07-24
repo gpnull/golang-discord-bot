@@ -60,7 +60,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 	timekeepingStatus := &models.TimekeepingStatus{
 		ButtonID:                buttonID,
 		Label:                   buttonName,
-		Style:                   discordgo.PrimaryButton,
+		Style:                   discordgo.SecondaryButton,
 		Content:                 "Welcome...",
 		TimekeepingChannelID:    util.Config.TimekeepingChannelID,
 		TimekeepingLogChannelID: timekeeping_channel_log.ID,

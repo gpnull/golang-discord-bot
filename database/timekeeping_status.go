@@ -15,17 +15,8 @@ type Database struct {
 
 // SaveTimeKeepingStatusButton saves or updates a timekeeping status button in SQL database
 func (db *Database) SaveTimeKeepingStatusButton(timekeeping *models.TimekeepingStatus) error {
-	updates := map[string]interface{}{}
-	if timekeeping.TimekeepingChannelID != "" {
-		updates["timekeeping_channel_id"] = timekeeping.TimekeepingChannelID
-	}
-	if timekeeping.TimekeepingLogChannelID != "" {
-		updates["timekeeping_log_channel_id"] = timekeeping.TimekeepingLogChannelID
-	}
-
 	result := db.DB.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.Assignments(updates),
+		UpdateAll: true,
 	}).Create(timekeeping)
 	if result.Error != nil {
 		return fmt.Errorf("failed to create/update button: %v", result.Error)
