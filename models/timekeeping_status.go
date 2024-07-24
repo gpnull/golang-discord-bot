@@ -14,6 +14,8 @@ type TimekeepingStatus struct {
 	TimekeepingChannelID    string
 	TimekeepingLogChannelID string
 	Status                  string `gorm:"type:enum('working', 'stopped')"`
+	TimeStart               int
+	TimeEnd                 int
 }
 
 func (TimekeepingStatus) TableName() string {

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gpnull/golang-github.com/database"
@@ -19,21 +20,38 @@ func init() {
 func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	dbClient := &database.Database{DB: database.DB}
 
-	if len(args) != 2 {
+	if len(args) != 4 {
 		s.ChannelMessageSend(m.ChannelID, "Usage: .createTimekeeping <name_of_register> <id_of_register>")
 		return
 	}
 
 	buttonName := args[0] // name_of_register
 	buttonID := args[1]   // id_of_register
+	timeStart, err := strconv.Atoi(args[2])
+	if err != nil {
+		s.ChannelMessageSend(m.ChannelID, "Invalid time_start value")
+		return
+	}
+
+	timeEnd, err := strconv.Atoi(args[3])
+	if err != nil {
+		s.ChannelMessageSend(m.ChannelID, "Invalid time_end value")
+		return
+	}
+
+	if timeEnd-timeStart != 2 || timeEnd%2 != 0 || timeStart%2 != 0 {
+		s.ChannelMessageSend(m.ChannelID, "Invalid shift schedule")
+		return
+	}
 
 	// Create new channel
 	categoryID := util.Config.TimekeepingLogCategoryID
+	topic := buttonID + " | Schedule: " + strconv.Itoa(timeStart) + "-" + strconv.Itoa(timeEnd)
 	timekeeping_channel_log, err := s.GuildChannelCreateComplex(m.GuildID, discordgo.GuildChannelCreateData{
 		Name:     buttonName,
 		Type:     discordgo.ChannelTypeGuildText,
 		ParentID: categoryID,
-		Topic:    buttonID,
+		Topic:    topic,
 		PermissionOverwrites: []*discordgo.PermissionOverwrite{
 			{
 				ID:    args[1], // User ID
@@ -67,6 +85,8 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		TimekeepingChannelID:    util.Config.TimekeepingChannelID,
 		TimekeepingLogChannelID: timekeeping_channel_log.ID,
 		Status:                  util.STOPPED,
+		TimeStart:               timeStart,
+		TimeEnd:                 timeEnd,
 	}
 
 	err = dbClient.SaveTimeKeepingStatusButton(timekeepingStatus)
