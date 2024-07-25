@@ -2,10 +2,12 @@ package pkg
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gpnull/golang-github.com/database"
 	handler "github.com/gpnull/golang-github.com/handlers"
+	"github.com/gpnull/golang-github.com/utils"
 	util "github.com/gpnull/golang-github.com/utils"
 	"gorm.io/gorm"
 )
@@ -16,6 +18,29 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 	if err != nil {
 		fmt.Println("Error retrieving buttons:", err)
 		return
+	}
+
+	now := util.GetDayTimeNow()
+	hourNow, err := strconv.Atoi(utils.GetHourNow())
+	if err != nil {
+		fmt.Println("Error converting hour:", err)
+		return
+	}
+	for _, button := range buttons {
+		if hourNow < button.TimeStart || hourNow > button.TimeEnd {
+			if button.Status == util.WORKING {
+				button.Status = util.STOPPED
+				button.Style = discordgo.SecondaryButton
+				button.Content = "Work has ended."
+
+				err := db.SaveTimeKeepingStatusButton(button)
+				if err != nil {
+					fmt.Println("Error updating button information:", err)
+				} else {
+					timekeepingEnd(s, now, button.TimekeepingLogChannelID)
+				}
+			}
+		}
 	}
 
 	clearExistingButtons(s, timeKeepingChannelId)
@@ -82,5 +107,13 @@ func clearExistingButtons(s *discordgo.Session, timeKeepingChannelId string) {
 		}
 
 		messagesDeleted += len(messages)
+	}
+}
+
+func timekeepingEnd(s *discordgo.Session, nowTime, channelId string) {
+	message := fmt.Sprintf("💤 Work has ended at: %s", nowTime)
+	_, err := s.ChannelMessageSend(channelId, message)
+	if err != nil {
+		fmt.Println("Error sending message:", err)
 	}
 }

@@ -13,3 +13,9 @@ func GetDayTimeNow() string {
 		now.Day(), now.Month(), now.Year(),
 		now.Hour(), now.Minute(), now.Second())
 }
+
+func GetHourNow() string {
+	loc, _ := time.LoadLocation("Asia/Bangkok") // GMT+7
+	now := time.Now().In(loc)
+	return fmt.Sprintf("%d", now.Hour())
+}

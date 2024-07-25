@@ -33,3 +33,12 @@ func (db *Database) GetTimeKeepingStatusButtons() ([]*models.TimekeepingStatus, 
 	}
 	return buttons, nil
 }
+
+func (db *Database) GetTimeKeepingStatusButtonByID(buttonID string) (*models.TimekeepingStatus, error) {
+	var button *models.TimekeepingStatus
+	result := db.DB.First(&button, "button_id = ?", buttonID)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to retrieve button with ID %s: %v", buttonID, result.Error)
+	}
+	return button, nil
+}

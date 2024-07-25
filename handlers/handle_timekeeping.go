@@ -15,20 +15,44 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 		return
 	}
 
-	now := util.GetDayTimeNow()
-
 	if i.Member.User.ID == buttonID {
 		dbClient := &database.Database{DB: database.DB}
 
-		timekeepingStatus := &models.TimekeepingStatus{
-			ButtonID:                buttonID,
-			Label:                   button.Label,
-			Style:                   button.Style,
-			Content:                 "",
-			TimekeepingChannelID:    util.Config.TimekeepingChannelID,
-			TimekeepingLogChannelID: channelID,
+		buttonResult, err := dbClient.GetTimeKeepingStatusButtonByID(buttonID)
+		if err != nil {
+			fmt.Println("Error retrieving button:", err)
+			return
 		}
 
+		// hourNow, err := strconv.Atoi(utils.GetHourNow())
+		// if err != nil {
+		// 	fmt.Println("Error converting hour:", err)
+		// 	return
+		// }
+
+		// if hourNow < buttonResult.TimeStart || hourNow > buttonResult.TimeEnd {
+		// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		// 		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		// 		Data: &discordgo.InteractionResponseData{
+		// 			Content: "Currently not within the working hours for this shift",
+		// 			Flags:   discordgo.MessageFlagsEphemeral,
+		// 		},
+		// 	})
+		// }
+
+		timekeepingStatus := &models.TimekeepingStatus{
+			ButtonID:                buttonResult.ButtonID,
+			Label:                   buttonResult.Label,
+			Style:                   buttonResult.Style,
+			Content:                 buttonResult.Content,
+			TimekeepingChannelID:    buttonResult.TimekeepingChannelID,
+			TimekeepingLogChannelID: buttonResult.TimekeepingLogChannelID,
+			Status:                  buttonResult.Status,
+			TimeStart:               buttonResult.TimeStart,
+			TimeEnd:                 buttonResult.TimeEnd,
+		}
+
+		now := util.GetDayTimeNow()
 		var content string
 		var status string
 		if button.Style == discordgo.SecondaryButton {
@@ -59,7 +83,7 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 		timekeepingStatus.Status = status
 
 		// Save the timekeeping status
-		err := dbClient.SaveTimeKeepingStatusButton(timekeepingStatus)
+		err = dbClient.SaveTimeKeepingStatusButton(timekeepingStatus)
 		if err != nil {
 			fmt.Println("Error saving button information:", err)
 		}
