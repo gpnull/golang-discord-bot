@@ -8,11 +8,11 @@ import (
 	"github.com/gpnull/golang-github.com/database"
 	"github.com/gpnull/golang-github.com/models"
 	"github.com/gpnull/golang-github.com/pkg"
-	util "github.com/gpnull/golang-github.com/utils"
+	"github.com/gpnull/golang-github.com/utils"
 )
 
 func init() {
-	util.Commands["createTimekeeping"] = createTimekeeping
+	utils.Commands["createTimekeeping"] = createTimekeeping
 }
 
 // .createTimekeeping name id_discord time_start time_end
@@ -45,7 +45,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 	}
 
 	// Create new channel
-	categoryID := util.Config.TimekeepingLogCategoryID
+	categoryID := utils.Config.TimekeepingLogCategoryID
 	topic := buttonID + " | Schedule: " + strconv.Itoa(timeStart) + "-" + strconv.Itoa(timeEnd)
 	timekeeping_channel_log, err := s.GuildChannelCreateComplex(m.GuildID, discordgo.GuildChannelCreateData{
 		Name:     buttonName,
@@ -82,9 +82,9 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		Label:                   buttonName,
 		Style:                   discordgo.SecondaryButton,
 		Content:                 "Welcome...",
-		TimekeepingChannelID:    util.Config.TimekeepingChannelID,
+		TimekeepingChannelID:    utils.Config.TimekeepingChannelID,
 		TimekeepingLogChannelID: timekeeping_channel_log.ID,
-		Status:                  util.STOPPED,
+		Status:                  utils.STOPPED,
 		TimeStart:               timeStart,
 		TimeEnd:                 timeEnd,
 	}
@@ -95,5 +95,5 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		return
 	}
 
-	pkg.RestoreButtons(s, database.DB, util.Config.TimekeepingChannelID)
+	pkg.RestoreButtons(s, database.DB, utils.Config.TimekeepingChannelID)
 }

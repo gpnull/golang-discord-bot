@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	util "github.com/gpnull/golang-github.com/utils"
+	"github.com/gpnull/golang-github.com/utils"
 )
 
 func init() {
-	util.Commands["ping"] = ping
+	utils.Commands["ping"] = ping
 }
 
 func ping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {

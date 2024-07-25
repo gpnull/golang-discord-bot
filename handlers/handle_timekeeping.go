@@ -6,7 +6,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/gpnull/golang-github.com/database"
 	"github.com/gpnull/golang-github.com/models"
-	util "github.com/gpnull/golang-github.com/utils"
+	"github.com/gpnull/golang-github.com/utils"
 )
 
 func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.InteractionCreate,
@@ -52,19 +52,19 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 			TimeEnd:                 buttonResult.TimeEnd,
 		}
 
-		now := util.GetDayTimeNow()
+		now := utils.GetDayTimeNow()
 		var content string
 		var status string
 		if button.Style == discordgo.SecondaryButton {
 			button.Style = discordgo.SuccessButton
 			timekeepingStart(s, now, channelID)
 			content = "Work has started."
-			status = util.WORKING
+			status = utils.WORKING
 		} else {
 			button.Style = discordgo.SecondaryButton
 			timekeepingEnd(s, now, channelID)
 			content = "Work has ended."
-			status = util.STOPPED
+			status = utils.STOPPED
 		}
 
 		// Update the button style in the actionRow
@@ -123,11 +123,11 @@ func HandleResetTimekeepingStatus(s *discordgo.Session) {
 		return
 	}
 
-	now := util.GetDayTimeNow()
+	now := utils.GetDayTimeNow()
 
 	for _, button := range buttons {
-		if button.Status == util.WORKING {
-			button.Status = util.STOPPED
+		if button.Status == utils.WORKING {
+			button.Status = utils.STOPPED
 			button.Style = discordgo.SecondaryButton
 			button.Content = "Work has ended."
 

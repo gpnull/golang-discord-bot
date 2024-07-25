@@ -31,20 +31,19 @@ func GuildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberAdd,
 		return
 	}
 
-	// Use a modal to send a welcome message
 	_, err := s.ChannelMessageSendComplex(welcomeChannelId, &discordgo.MessageSend{
 		Content: fmt.Sprintf("Welcome to the server, %s!", m.User.Username),
 		Embed: &discordgo.MessageEmbed{
 			Title:       "Welcome!",
 			Description: fmt.Sprintf("Hello, %s! Welcome to the server.", m.User.Username),
-			Color:       0x00ff00,                        // Green color
-			Timestamp:   time.Now().Format(time.RFC3339), // Add Timestamp
+			Color:       0x00ff00, // Green color
+			Timestamp:   time.Now().Format(time.RFC3339),
 			Footer: &discordgo.MessageEmbedFooter{
-				Text:    fmt.Sprintf("Join at %s", time.Now().Format("15:04:05 MST")), // Add Footer
+				Text:    fmt.Sprintf("Join at %s", time.Now().Format("15:04:05 MST")),
 				IconURL: "https://i.imgur.com/AfFp7pu.png",
 			},
 			Thumbnail: &discordgo.MessageEmbedThumbnail{
-				URL: "https://i.imgur.com/AfFp7pu.png", // Add Thumbnail URL
+				URL: "https://i.imgur.com/AfFp7pu.png",
 			},
 			Author: &discordgo.MessageEmbedAuthor{
 				Name:    "Author Name",

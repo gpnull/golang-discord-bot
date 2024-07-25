@@ -13,7 +13,7 @@ import (
 	"github.com/gpnull/golang-github.com/ready"
 
 	"github.com/bwmarrin/discordgo"
-	util "github.com/gpnull/golang-github.com/utils"
+	"github.com/gpnull/golang-github.com/utils"
 )
 
 func init() {
@@ -21,27 +21,27 @@ func init() {
 }
 
 func main() {
-	s, err := discordgo.New("Bot " + util.Config.Token)
+	s, err := discordgo.New("Bot " + utils.Config.Token)
 	if err != nil {
 		log.Panicf("Error creating session: %s", err)
 	}
 
-	database.ConnectDB(util.Config.DbURL)
+	database.ConnectDB(utils.Config.DbURL)
 	defer database.CloseDB()
 	database.Migrate()
 	dbClient := database.DB
 
 	// Restore previously created buttons
-	pkg.RestoreButtons(s, dbClient, util.Config.TimekeepingChannelID)
+	pkg.RestoreButtons(s, dbClient, utils.Config.TimekeepingChannelID)
 
 	s.AddHandler(func(s *discordgo.Session, e *discordgo.Ready) {
 		ready.Status(s, e)
 	})
 	s.AddHandler(func(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
-		ready.GuildMemberAdd(s, m, dbClient, util.Config.AutoRoleId, util.Config.WelcomeChannelID)
+		ready.GuildMemberAdd(s, m, dbClient, utils.Config.AutoRoleId, utils.Config.WelcomeChannelID)
 	})
 	s.AddHandler(func(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
-		ready.GuildMemberLeave(s, m, util.Config.LeaveChannelID)
+		ready.GuildMemberLeave(s, m, utils.Config.LeaveChannelID)
 	})
 	s.AddHandler(pkg.MessageCreate)
 

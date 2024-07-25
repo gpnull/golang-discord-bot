@@ -18,7 +18,6 @@ type configuration struct {
 	UseBotID   string `json:"use_bot_id"`
 }
 
-// Config is the config.json file
 var Config configuration
 
 func init() {

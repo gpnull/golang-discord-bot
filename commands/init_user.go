@@ -6,15 +6,15 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/gpnull/golang-github.com/database"
 	"github.com/gpnull/golang-github.com/models"
-	util "github.com/gpnull/golang-github.com/utils"
+	"github.com/gpnull/golang-github.com/utils"
 )
 
 func init() {
-	util.Commands["initUsers"] = initUsers
+	utils.Commands["initUsers"] = initUsers
 }
 
 func initUsers(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
-	if !util.HasPermissionClear(m, util.Config.UseBotID) {
+	if !utils.HasPermissionClear(m, utils.Config.UseBotID) {
 		s.ChannelMessageSend(m.ChannelID, "You do not have permission to use this command.")
 		return
 	}

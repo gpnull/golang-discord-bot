@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	util "github.com/gpnull/golang-github.com/utils"
+	"github.com/gpnull/golang-github.com/utils"
 )
 
 var prefix = "."
@@ -22,11 +22,11 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	perm := util.IncludesPerm
+	perm := utils.IncludesPerm
 
 	if perm(discordgo.PermissionViewChannel|discordgo.PermissionSendMessages|discordgo.PermissionEmbedLinks, perms) {
 		args := strings.Split(m.Content[len(prefix):], " ")
-		if cmd, ok := util.Commands[args[0]]; ok {
+		if cmd, ok := utils.Commands[args[0]]; ok {
 			if len(args) == 1 {
 				args = []string{}
 			} else {

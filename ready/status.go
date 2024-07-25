@@ -11,7 +11,7 @@ import (
 func Status(s *discordgo.Session, e *discordgo.Ready) {
 	go func() {
 		for {
-			statusIndex := rand.Intn(3) // Generate a random index for status selection
+			statusIndex := rand.Intn(3)
 			statuses := []string{"perfect nil", "perfect null", "perfect bot"}
 
 			s.UpdateStatusComplex(discordgo.UpdateStatusData{

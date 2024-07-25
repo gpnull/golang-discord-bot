@@ -6,9 +6,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gpnull/golang-github.com/database"
-	handler "github.com/gpnull/golang-github.com/handlers"
+	"github.com/gpnull/golang-github.com/handlers"
 	"github.com/gpnull/golang-github.com/utils"
-	util "github.com/gpnull/golang-github.com/utils"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +19,7 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 		return
 	}
 
-	now := util.GetDayTimeNow()
+	now := utils.GetDayTimeNow()
 	hourNow, err := strconv.Atoi(utils.GetHourNow())
 	if err != nil {
 		fmt.Println("Error converting hour:", err)
@@ -28,8 +27,8 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 	}
 	for _, button := range buttons {
 		if hourNow < button.TimeStart || hourNow > button.TimeEnd {
-			if button.Status == util.WORKING {
-				button.Status = util.STOPPED
+			if button.Status == utils.WORKING {
+				button.Status = utils.STOPPED
 				button.Style = discordgo.SecondaryButton
 				button.Content = "Work has ended."
 
@@ -55,7 +54,7 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 				},
 			},
 		}
-		_, err = s.ChannelMessageSendComplex(util.Config.TimekeepingChannelID, &discordgo.MessageSend{
+		_, err = s.ChannelMessageSendComplex(utils.Config.TimekeepingChannelID, &discordgo.MessageSend{
 			Content: button.Content,
 			Components: []discordgo.MessageComponent{
 				actionRow,
@@ -80,7 +79,7 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 
 		s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			if i.MessageComponentData().CustomID == button.ButtonID {
-				handler.HandleTimekeepingInteraction(s, i, button.ButtonID, &buttonRestore, actionRow, channelID)
+				handlers.HandleTimekeepingInteraction(s, i, button.ButtonID, &buttonRestore, actionRow, channelID)
 			}
 		})
 	}

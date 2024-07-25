@@ -5,17 +5,17 @@ import (
 	"strconv"
 
 	"github.com/bwmarrin/discordgo"
-	util "github.com/gpnull/golang-github.com/utils"
+	"github.com/gpnull/golang-github.com/utils"
 )
 
 func init() {
-	util.Commands["clear"] = clear
-	util.Commands["clearall"] = clearAll
+	utils.Commands["clear"] = clear
+	utils.Commands["clearall"] = clearAll
 }
 
 func clear(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	// Check if the user has permission to delete messages
-	if !util.HasPermissionClear(m, util.Config.UseBotID) {
+	if !utils.HasPermissionClear(m, utils.Config.UseBotID) {
 		s.ChannelMessageSend(m.ChannelID, "You do not have permission to use this command.")
 		return
 	}
@@ -51,7 +51,7 @@ func clear(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 
 func clearAll(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	// Check if the user has permission to delete messages
-	if !util.HasPermissionClear(m, util.Config.UseBotID) {
+	if !utils.HasPermissionClear(m, utils.Config.UseBotID) {
 		s.ChannelMessageSend(m.ChannelID, "You do not have permission to use this command.")
 		return
 	}

@@ -15,14 +15,13 @@ func GuildMemberLeave(s *discordgo.Session, m *discordgo.GuildMemberAdd, leaveCh
 		Embed: &discordgo.MessageEmbed{
 			Title:       "Good Bye!",
 			Description: fmt.Sprintf("Bye bye, %s!", m.User.Username),
-			Color:       0xff0000,                        // Red color
-			Timestamp:   time.Now().Format(time.RFC3339), // Add Timestamp
+			Color:       0xff0000, // Red color
+			Timestamp:   time.Now().Format(time.RFC3339),
 			Footer: &discordgo.MessageEmbedFooter{
-				Text:    fmt.Sprintf("Left at %s", time.Now().Format("15:04:05 MST")), // Add Footer
-				IconURL: "https://i.imgur.com/AfFp7pu.png",
+				Text: fmt.Sprintf("Left at %s", time.Now().Format("15:04:05 MST")),
 			},
 			Thumbnail: &discordgo.MessageEmbedThumbnail{
-				URL: "https://i.imgur.com/AfFp7pu.png", // Add Thumbnail URL
+				URL: "https://i.imgur.com/AfFp7pu.png",
 			},
 			Author: &discordgo.MessageEmbedAuthor{
 				Name:    "Author Name",

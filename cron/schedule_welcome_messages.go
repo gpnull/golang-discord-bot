@@ -8,7 +8,7 @@ import (
 	"github.com/gpnull/golang-github.com/database"
 	"github.com/gpnull/golang-github.com/handlers"
 	"github.com/gpnull/golang-github.com/pkg"
-	util "github.com/gpnull/golang-github.com/utils"
+	"github.com/gpnull/golang-github.com/utils"
 	cron "github.com/robfig/cron/v3"
 )
 
@@ -20,7 +20,7 @@ func ResetTimekeepingStatus(s *discordgo.Session) {
 	addCronJob := func(spec string) {
 		c.AddFunc(spec, func() {
 			handlers.HandleResetTimekeepingStatus(s)
-			pkg.RestoreButtons(s, database.DB, util.Config.TimekeepingChannelID)
+			pkg.RestoreButtons(s, database.DB, utils.Config.TimekeepingChannelID)
 		})
 	}
 
