@@ -21,7 +21,8 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 	dbClient := &database.Database{DB: database.DB}
 
 	if len(args) != 4 {
-		s.ChannelMessageSend(m.ChannelID, "Usage: .createTimekeeping <name_of_register> <id_of_register>")
+		s.ChannelMessageSend(m.ChannelID,
+			"Usage: .createTimekeeping <name_of_register> <id_of_register> <schedule_time_start> <schedule_time_end>")
 		return
 	}
 
