@@ -9,11 +9,12 @@ import (
 	"github.com/gpnull/golang-github.com/utils"
 )
 
+// init doctor form list discord
 func init() {
-	utils.Commands["initUsers"] = initUsers
+	utils.Commands["initlist"] = initList
 }
 
-func initUsers(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
+func initList(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	if !utils.HasPermissionClear(m, utils.Config.UseBotID) {
 		s.ChannelMessageSend(m.ChannelID, "You do not have permission to use this command.")
 		return

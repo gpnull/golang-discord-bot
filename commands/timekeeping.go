@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	utils.Commands["createTimekeeping"] = createTimekeeping
+	utils.Commands["createtimekeeping"] = createTimekeeping
 }
 
 // .createTimekeeping name id_discord time_start time_end
@@ -22,7 +22,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 
 	if len(args) != 4 {
 		s.ChannelMessageSend(m.ChannelID,
-			"Usage: .createTimekeeping <name_of_register> <id_of_register> <schedule_time_start> <schedule_time_end>")
+			"Usage: .createtimekeeping <name_of_register> <id_of_register> <schedule_time_start> <schedule_time_end>")
 		return
 	}
 
