@@ -24,22 +24,6 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 			return
 		}
 
-		// hourNow, err := strconv.Atoi(utils.GetHourNow())
-		// if err != nil {
-		// 	fmt.Println("Error converting hour:", err)
-		// 	return
-		// }
-
-		// if hourNow < buttonResult.TimeStart || hourNow > buttonResult.TimeEnd {
-		// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		// 		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		// 		Data: &discordgo.InteractionResponseData{
-		// 			Content: "Currently not within the working hours for this shift",
-		// 			Flags:   discordgo.MessageFlagsEphemeral,
-		// 		},
-		// 	})
-		// }
-
 		timekeepingStatus := &models.TimekeepingStatus{
 			ButtonID:                buttonResult.ButtonID,
 			Label:                   buttonResult.Label,
@@ -84,6 +68,77 @@ func HandleTimekeepingInteraction(s *discordgo.Session, i *discordgo.Interaction
 
 		// Save the timekeeping status
 		err = dbClient.SaveTimeKeepingStatusButton(timekeepingStatus)
+		if err != nil {
+			fmt.Println("Error saving button information:", err)
+		}
+	} else {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Invalid operation, please try again",
+				Flags:   discordgo.MessageFlagsEphemeral,
+			},
+		})
+	}
+}
+
+func HandleTimekeepingOvertimeInteraction(s *discordgo.Session, i *discordgo.InteractionCreate,
+	buttonID string, button *discordgo.Button, actionRow discordgo.ActionsRow, channelID string) {
+	if i.Type != discordgo.InteractionMessageComponent {
+		return
+	}
+
+	if i.Member.User.ID == buttonID {
+		dbClient := &database.Database{DB: database.DB}
+
+		buttonResult, err := dbClient.GetTimeKeepingOvertimeStatusButtonByID(buttonID)
+		if err != nil {
+			fmt.Println("Error retrieving button:", err)
+			return
+		}
+
+		timekeepingOvertimeStatus := &models.TimekeepingOvertimeStatus{
+			ButtonID:                        buttonResult.ButtonID,
+			Label:                           buttonResult.Label,
+			Style:                           buttonResult.Style,
+			Content:                         buttonResult.Content,
+			TimekeepingOvertimeChannelID:    buttonResult.TimekeepingOvertimeChannelID,
+			TimekeepingOvertimeLogChannelID: buttonResult.TimekeepingOvertimeLogChannelID,
+			Status:                          buttonResult.Status,
+		}
+
+		now := utils.GetDayTimeNow()
+		var content string
+		var status string
+		if button.Style == discordgo.SecondaryButton {
+			button.Style = discordgo.SuccessButton
+			timekeepingStart(s, now, channelID)
+			content = "Work has started."
+			status = utils.WORKING
+		} else {
+			button.Style = discordgo.SecondaryButton
+			timekeepingEnd(s, now, channelID)
+			content = "Work has ended."
+			status = utils.STOPPED
+		}
+
+		// Update the button style in the actionRow
+		actionRow.Components[0] = button
+
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseUpdateMessage,
+			Data: &discordgo.InteractionResponseData{
+				Content:    content,
+				Components: []discordgo.MessageComponent{actionRow},
+			},
+		})
+
+		timekeepingOvertimeStatus.Style = button.Style
+		timekeepingOvertimeStatus.Content = content
+		timekeepingOvertimeStatus.Status = status
+
+		// Save the timekeeping status
+		err = dbClient.SaveTimeKeepingOvertimeStatusButton(timekeepingOvertimeStatus)
 		if err != nil {
 			fmt.Println("Error saving button information:", err)
 		}

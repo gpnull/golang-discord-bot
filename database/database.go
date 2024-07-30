@@ -23,7 +23,7 @@ func ConnectDB(connectionString string) {
 
 func Migrate() {
 	err := DB.AutoMigrate(
-		&models.User{},
+		&models.UserDoctor{},
 		&models.TimekeepingStatus{},
 		&models.TimekeepingOvertimeStatus{},
 	)

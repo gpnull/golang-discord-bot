@@ -14,16 +14,17 @@ import (
 func GuildMemberAdd(s *discordgo.Session, m *discordgo.GuildMemberAdd,
 	dbClient *gorm.DB, autoRoleId, welcomeChannelId string) {
 	db := &database.Database{DB: dbClient}
-	user := models.User{
-		DiscordID:            m.User.ID,
-		Username:             m.User.Username,
-		Email:                m.User.Email,
-		Avatar:               m.User.Avatar,
-		Locale:               m.User.Locale,
-		GlobalName:           m.User.GlobalName,
-		Verified:             m.User.Verified,
-		Banner:               m.User.Banner,
-		TimekeepingChannelID: "",
+	user := models.UserDoctor{
+		DiscordID:                    m.User.ID,
+		Username:                     m.User.Username,
+		Email:                        m.User.Email,
+		Avatar:                       m.User.Avatar,
+		Locale:                       m.User.Locale,
+		GlobalName:                   m.User.GlobalName,
+		Verified:                     m.User.Verified,
+		Banner:                       m.User.Banner,
+		TimekeepingChannelID:         "",
+		TimekeepingOvertimeChannelID: "",
 	}
 
 	if err := db.CreateUser(&user); err != nil {

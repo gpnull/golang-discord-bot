@@ -71,7 +71,58 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 			Style:    button.Style,
 		}
 
-		channelID := db.GetChannelIDByDiscordID(button.ButtonID)
+		channelID := db.GetTimekeepingChannelIDByDiscordID(button.ButtonID)
+		if channelID == "" {
+			fmt.Println("Error: Channel ID not found for user")
+			return
+		}
+
+		s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			if i.MessageComponentData().CustomID == button.ButtonID {
+				handlers.HandleTimekeepingInteraction(s, i, button.ButtonID, &buttonRestore, actionRow, channelID)
+			}
+		})
+	}
+}
+
+func RestoreOTButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingOvertimeChannelId string) {
+	db := &database.Database{DB: dbClient}
+	buttons, err := db.GetTimeKeepingOvertimeStatusButtons()
+	if err != nil {
+		fmt.Println("Error retrieving buttons:", err)
+		return
+	}
+
+	clearExistingButtons(s, timeKeepingOvertimeChannelId)
+
+	for _, button := range buttons {
+		actionRow := discordgo.ActionsRow{
+			Components: []discordgo.MessageComponent{
+				discordgo.Button{
+					Label:    button.Label,
+					CustomID: button.ButtonID,
+					Style:    button.Style,
+				},
+			},
+		}
+		_, err = s.ChannelMessageSendComplex(utils.Config.TimekeepingOvertimeChannelID, &discordgo.MessageSend{
+			Content: button.Content,
+			Components: []discordgo.MessageComponent{
+				actionRow,
+			},
+		})
+		if err != nil {
+			fmt.Println("Error sending message:", err)
+			return
+		}
+
+		buttonRestore := discordgo.Button{
+			Label:    button.Label,
+			CustomID: button.ButtonID,
+			Style:    button.Style,
+		}
+
+		channelID := db.GetTimekeepingOvertimeChannelIDByDiscordID(button.ButtonID)
 		if channelID == "" {
 			fmt.Println("Error: Channel ID not found for user")
 			return
@@ -86,10 +137,10 @@ func RestoreButtons(s *discordgo.Session, dbClient *gorm.DB, timeKeepingChannelI
 }
 
 // Function to clear existing buttons from the UI
-func clearExistingButtons(s *discordgo.Session, timeKeepingChannelId string) {
+func clearExistingButtons(s *discordgo.Session, channelID string) {
 	var messagesDeleted int
 	for {
-		messages, err := s.ChannelMessages(timeKeepingChannelId, 100, "", "", "")
+		messages, err := s.ChannelMessages(channelID, 100, "", "", "")
 		if err != nil || len(messages) == 0 {
 			break
 		}
@@ -99,9 +150,9 @@ func clearExistingButtons(s *discordgo.Session, timeKeepingChannelId string) {
 			messageIDs[i] = msg.ID
 		}
 
-		err = s.ChannelMessagesBulkDelete(timeKeepingChannelId, messageIDs)
+		err = s.ChannelMessagesBulkDelete(channelID, messageIDs)
 		if err != nil {
-			s.ChannelMessageSend(timeKeepingChannelId, "An error occurred while deleting messages.")
+			s.ChannelMessageSend(channelID, "An error occurred while deleting messages.")
 			return
 		}
 

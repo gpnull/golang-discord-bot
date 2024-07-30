@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	utils.Commands["restoreButtons"] = restoreButtons
+	utils.Commands["resetbtn"] = restoreButtons
 }
 
 func restoreButtons(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {

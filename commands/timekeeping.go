@@ -12,17 +12,15 @@ import (
 )
 
 func init() {
-	utils.Commands["createtimekeeping"] = createTimekeeping
+	utils.Commands["regtk"] = createTimekeeping
 }
-
-// .createTimekeeping name id_discord time_start time_end
 
 func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	dbClient := &database.Database{DB: database.DB}
 
 	if len(args) != 4 {
 		s.ChannelMessageSend(m.ChannelID,
-			"Usage: .createtimekeeping <name_of_register> <id_of_register> <schedule_time_start> <schedule_time_end>")
+			"Usage: .regtk <name_of_register> <id_of_register> <schedule_time_start> <schedule_time_end>")
 		return
 	}
 
@@ -72,7 +70,7 @@ func createTimekeeping(s *discordgo.Session, m *discordgo.MessageCreate, args []
 		return
 	}
 
-	err = dbClient.UpdateUserChannelID(buttonID, timekeeping_channel_log.ID)
+	err = dbClient.UpdateTimekeepingChannelID(buttonID, timekeeping_channel_log.ID)
 	if err != nil {
 		fmt.Println("Error updating user channel ID:", err)
 		return

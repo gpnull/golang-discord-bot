@@ -9,10 +9,12 @@ type configuration struct {
 	Token string `json:"token"`
 	DbURL string `json:"db_url"`
 
-	WelcomeChannelID         string `json:"welcome_channel_id"`
-	LeaveChannelID           string `json:"leave_channel_id"`
-	TimekeepingChannelID     string `json:"timekeeping_channel_id"`
-	TimekeepingLogCategoryID string `json:"timekeeping_log_category_id"`
+	WelcomeChannelID                 string `json:"welcome_channel_id"`
+	LeaveChannelID                   string `json:"leave_channel_id"`
+	TimekeepingChannelID             string `json:"timekeeping_channel_id"`
+	TimekeepingOvertimeChannelID     string `json:"timekeeping_overtime_channel_id"`
+	TimekeepingLogCategoryID         string `json:"timekeeping_log_category_id"`
+	TimekeepingOvertimeLogCategoryID string `json:"timekeeping_overtime_log_category_id"`
 
 	AutoRoleId string `json:"auto_role_id"`
 	UseBotID   string `json:"use_bot_id"`

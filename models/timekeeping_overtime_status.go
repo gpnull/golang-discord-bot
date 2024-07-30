@@ -7,13 +7,13 @@ import (
 
 type TimekeepingOvertimeStatus struct {
 	gorm.Model
-	ButtonID                string `gorm:"type:varchar(255);uniqueIndex"`
-	Label                   string
-	Style                   discordgo.ButtonStyle
-	Content                 string
-	TimekeepingChannelID    string
-	TimekeepingLogChannelID string
-	Status                  string `gorm:"type:enum('working', 'stopped')"`
+	ButtonID                        string `gorm:"type:varchar(255);uniqueIndex"`
+	Label                           string
+	Style                           discordgo.ButtonStyle
+	Content                         string
+	TimekeepingOvertimeChannelID    string
+	TimekeepingOvertimeLogChannelID string
+	Status                          string `gorm:"type:enum('working', 'stopped')"`
 }
 
 func (TimekeepingOvertimeStatus) TableName() string {
