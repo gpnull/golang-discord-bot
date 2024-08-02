@@ -36,7 +36,6 @@ func ping(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 		return
 	}
 
-	// Add heart reaction to the original message
 	err = s.MessageReactionAdd(m.ChannelID, m.ID, "❤️")
 	if err != nil {
 		return
