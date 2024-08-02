@@ -2,7 +2,6 @@
 *.exe
 
 config.json
-FINAL_EXECUTABLE_NAME
 
 *.toml
 /tmp/
